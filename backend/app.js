@@ -5,14 +5,27 @@ const helmet = require("helmet");
 const cors = require("cors");
 const morgan = require("morgan");
 const rateLimit = require("express-rate-limit");
-
+const mysql = require("mysql2");
 require("dotenv").config();
 
-const userRoutes = require("./routes/user");
+const connection = mysql.createConnection({
+  host: process.env.MYSQL_HOST,
+  user: process.env.MYSQL_USER,
+  password: process.env.MYSQL_PASS,
+  database: process.env.MYSQL_DB,
+});
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
+});
+
+connection.connect(function (err) {
+  if (err) {
+    console.log(err);
+  } else {
+    console.log("connection created with Mysql successfully");
+  }
 });
 
 const app = express();
@@ -38,8 +51,6 @@ app.use((req, res, next) => {
 app.use(express.json());
 
 app.use("/images", express.static(path.join(__dirname, "images")));
-
-app.use("/api/auth", userRoutes);
 
 // Renvoie les requetes dans la console
 app.use(morgan("tiny"));
