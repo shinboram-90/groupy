@@ -6,7 +6,7 @@ const db = require("../dbConnection");
 
 exports.signup = (req, res, next) => {
   db.query(
-    `SELECT * FROM employees WHERE LOWER(email) = LOWER(${db.escape(
+    `SELECT * FROM users WHERE LOWER(email) = LOWER(${db.escape(
       req.body.email
     )});`,
     (err, result) => {
@@ -48,7 +48,7 @@ exports.signup = (req, res, next) => {
 
 exports.login = (req, res, next) => {
   db.query(
-    `SELECT * FROM employees WHERE email = ${db.escape(req.body.email)};`,
+    `SELECT * FROM users WHERE email = ${db.escape(req.body.email)};`,
     (err, result) => {
       // user does not exists
       if (err) {
@@ -110,7 +110,7 @@ exports.login = (req, res, next) => {
 //   const theToken = req.headers.authorization.split(" ")[1];
 //   const decoded = jwt.verify(theToken, "the-super-strong-secrect");
 //   db.query(
-//     "SELECT * FROM employees where id=?",
+//     "SELECT * FROM users where id=?",
 //     decoded.id,
 //     function (error, results, fields) {
 //       if (error) throw error;

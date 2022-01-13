@@ -9,6 +9,7 @@ const rateLimit = require("express-rate-limit");
 require("dotenv").config();
 
 const userRoutes = require("./routes/user");
+const adminRoutes = require("./routes/user");
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -17,29 +18,32 @@ const limiter = rateLimit({
 
 const app = express();
 
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content, Accept, Content-Type, Authorization"
+  );
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET, POST, PUT, DELETE, PATCH, OPTIONS"
+  );
+  next();
+});
+
 app.use(helmet());
 app.use(cors());
 
-app.use((req, res, next) => {
-  console.log("Requête reçue !");
-  next();
-});
-
-app.use((req, res, next) => {
-  res.status(201);
-  next();
-});
-
-app.use((req, res, next) => {
-  res.json({ message: "All good mate!" });
-  next();
-});
+// app.use((req, res, next) => {
+//   res.json({ message: "All good mate!" });
+//   next();
+// });
 
 app.use(express.json());
 
 app.use("/images", express.static(path.join(__dirname, "images")));
-
 app.use("/api/auth", userRoutes);
+app.use("/api/admin", adminRoutes);
 
 // Renvoie les requetes dans la console
 app.use(morgan("tiny"));
