@@ -6,10 +6,10 @@ const multer = require("../middleware/multer-config");
 
 const userCtrl = require("../controllers/user");
 
-router.post("/signup", userCtrl.signup);
-router.post("/login", userCtrl.login);
+// router.post("/signup", userCtrl.signup);
+// router.post("/login", userCtrl.login);
 
-// router.get("/", auth, userCtrl.getAllUsers);
+router.get("/", userCtrl.getAllUsers);
 // router.get("/:id", auth, userCtrl.getOneUser);
 
 // router.put("/:id", auth, multer, userCtrl.modifyUser);
