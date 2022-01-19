@@ -9,7 +9,6 @@ const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 
 const userRoutes = require('./routes/user');
-const adminRoutes = require('./routes/user');
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -42,8 +41,8 @@ app.use(cors());
 app.use(express.json());
 
 app.use('/images', express.static(path.join(__dirname, 'images')));
-app.use('/api/auth', userRoutes);
-app.use('/api/admin', adminRoutes);
+// app.use('/avatar', express.static(path.join(__dirname, 'avatar')));
+app.use('/', userRoutes);
 
 // Renvoie les requetes dans la console
 app.use(morgan('tiny'));

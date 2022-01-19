@@ -6,9 +6,14 @@ const connection = mysql.createConnection({
   // unix_socket: '/Applications/MAMP/Library/bin/mysql',
   // /Applications/MAMP/Library/bin/mysqld --skip-grant-tables
   // /Applications/MAMP/Library/bin/mysql --host=localhost -uroot -proot
-  port: 8889,
-  password: 'root',
-  database: 'groupomania',
+
+  // OMG Mamp use another port, and brew use default mysqm port 3306
+  // Mamp use this foder: /Applications/MAMP/Library/bin/mysql
+  // Brew use his own folder : /usr/local/Cellar/mysql/(version...)
+  // with brew you don't need use path to execute bin files, just type 'mysql -uroot -p' on the terminal
+  port: process.env.MYSQL_PORT,
+  password: process.env.MYSQL_PASS,
+  database: process.env.MYSQL_DB,
 });
 
 connection.connect(function (err) {
