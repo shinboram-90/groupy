@@ -1,11 +1,11 @@
 const db = require('../dbConnection');
 
-// const passwordValidator = 'password-validator';
+const passwordValidator = 'password-validator';
 // exports.schemaPV = new passwordValidator();
 
 // schemaPV.is().min(8).is().max(35);
 
-const User = function (user) {
+const User = (user) => {
   this.username = user.username;
   this.email = user.email;
   this.password = user.password;
@@ -19,10 +19,10 @@ const User = function (user) {
 User.create = (newUser, result) => {
   db.query('INSERT INTO users SET ?', newUser, (err, res) => {
     if (err) {
-      console.log(`error: ${err}`);
+      console.log('error:', err);
       result(err, null);
     } else {
-      console.log(res.insertId);
+      console.log('Generated id no.:', res.insertId);
       result(null, res.insertId);
     }
   });
@@ -34,9 +34,26 @@ User.findById = (id, result) => {
       console.log('error: ', err);
       result(err, null);
     } else {
+      console.log('id', res[0]['id']);
       result(null, res);
     }
   });
+};
+
+User.signin = (username, password, result) => {
+  db.query(
+    'SELECT * FROM users WHERE username = ? AND password = ?',
+    [username, password],
+    (err, res) => {
+      if (err) {
+        console.error(err);
+        result(err, null);
+      } else {
+        console.log('Entered username:', res);
+        result(null, res);
+      }
+    }
+  );
 };
 
 User.delete = (id, result) => {
@@ -53,10 +70,10 @@ User.delete = (id, result) => {
 User.findAll = (result) => {
   db.query('SELECT * FROM users', (err, res) => {
     if (err) {
-      console.log(`error: ${err}`);
+      console.log('error:', err);
       result(null, err);
     } else {
-      console.log(`User list: ${res}`);
+      console.log(res);
       result(null, res);
     }
   });
@@ -67,10 +84,10 @@ User.update = (result) => {
     `UPDATE users SET username = "COVID19", email = "testemail", password = "testpass", biography = "bloody hell" WHERE id = "13"`,
     (err, res) => {
       if (err) {
-        console.log(`error: ${err}`);
+        console.log('error:', err);
         result(null, err);
       } else {
-        console.log(`User list: ${res}`);
+        console.log('User list:', res.affectedRows);
         result(null, res);
       }
     }

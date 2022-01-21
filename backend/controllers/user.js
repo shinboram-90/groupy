@@ -47,30 +47,35 @@ exports.deleteUser = (req, res, next) => {
   });
 };
 
-exports.updateUser = (req, res, next) => {
-  // let updateUser = User.findById(req.params.id, (err, user) => {
-  //   if (err) res.send(err);
-  //   res.status(200).json(user);
-  // });
-  if (req.body.constructor === Object && Object.keys(req.body).length === 0) {
-    res
-      .status(400)
-      .send({ error: true, message: 'Please provide all required fields' });
-  } else {
-    User.update((erreur, userId) => {
-      if (erreur) res.send(err);
-      res.json({
-        error: false,
-        message: 'User updated successfully!',
-        data: userId[0],
-      });
-    });
-  }
-};
+// exports.login = (req, res, next) => {
+//   const username = req.body.username;
+//   const password = req.body.password;
+//   User.signin(username, password, (err, user) => {
+//     if (username === '' && password === '') {
+//       res.send('Please enter your username and password');
+//     } else if (user.length > 0) {
+//       req.loggedin = true;
+//       res.json({
+//         error: false,
+//         message: `${user[0]['username']} user successfully signed in`,
+//       });
+//       // res.redirect('/home');
+//     } else {
+//       res.send('Incorrect Username and/or Password!');
+//     }
+//     res.end();
+//   });
+// };
 
 exports.login = (req, res, next) => {
+  // User.findById(req.params.id, (err, user) => {
+  //   if (err) res.send(err);
+  //   res.status(200).json(user.username);
+  // });
+
   const username = req.body.username;
   const password = req.body.password;
+  // bcrypt.compare(password, )
   if (username && password) {
     db.query(
       'SELECT * FROM users WHERE username = ? AND password = ?',
@@ -93,6 +98,27 @@ exports.login = (req, res, next) => {
   } else {
     res.send('Please enter Username and Password!');
     res.end();
+  }
+};
+
+exports.updateUser = (req, res, next) => {
+  // let updateUser = User.findById(req.params.id, (err, user) => {
+  //   if (err) res.send(err);
+  //   res.status(200).json(user);
+  // });
+  if (req.body.constructor === Object && Object.keys(req.body).length === 0) {
+    res
+      .status(400)
+      .send({ error: true, message: 'Please provide all required fields' });
+  } else {
+    User.update((erreur, userId) => {
+      if (erreur) res.send(err);
+      res.json({
+        error: false,
+        message: 'User updated successfully!',
+        data: userId[0],
+      });
+    });
   }
 };
 

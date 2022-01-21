@@ -16,20 +16,20 @@ const connection = mysql.createConnection({
   database: process.env.MYSQL_DB,
 });
 
-connection.connect(function (err) {
+connection.connect((err) => {
   if (err) {
     console.log(err);
   } else {
-    console.log('connection created with Mysql 1 successfully');
+    console.log('connection created with Mysql successfully');
   }
 });
 
-connection.query('SELECT * FROM users', (err, rows) => {
-  if (!err) {
-    console.log(rows);
-  } else {
-    console.log(err);
-  }
-});
+// connection.query('SELECT * FROM users', (err, rows) => {
+//   if (!err) {
+//     console.log(rows);
+//   } else {
+//     console.log(err);
+//   }
+// });
 
 module.exports = connection;

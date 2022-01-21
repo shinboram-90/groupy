@@ -42,7 +42,7 @@ app.use(express.json());
 
 app.use('/images', express.static(path.join(__dirname, 'images')));
 // app.use('/avatar', express.static(path.join(__dirname, 'avatar')));
-app.use('/api/auth', userRoutes);
+app.use('/api', userRoutes);
 
 // Renvoie les requetes dans la console
 app.use(morgan('tiny'));
