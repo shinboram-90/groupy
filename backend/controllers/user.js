@@ -28,8 +28,10 @@ exports.getAllUsers = (req, res, next) => {
       return res
         .status(400)
         .json({ error: "impossible d'afficher les listes des membres" });
+    } else {
+      console.log(user[0].status);
+      return res.status(200).json(user);
     }
-    return res.status(200).json(user);
   });
 };
 
@@ -43,62 +45,34 @@ exports.getOneUser = (req, res, next) => {
 exports.deleteUser = (req, res, next) => {
   User.delete(req.params.id, (err, user) => {
     if (err) res.send(err);
-    res.json({ error: false, message: 'User successfully deleted' });
+    res.json({ message: 'User successfully deleted' });
   });
 };
 
-// exports.login = (req, res, next) => {
-//   const username = req.body.username;
-//   const password = req.body.password;
-//   User.signin(username, password, (err, user) => {
-//     if (username === '' && password === '') {
-//       res.send('Please enter your username and password');
-//     } else if (user.length > 0) {
-//       req.loggedin = true;
-//       res.json({
-//         error: false,
-//         message: `${user[0]['username']} user successfully signed in`,
-//       });
-//       // res.redirect('/home');
-//     } else {
-//       res.send('Incorrect Username and/or Password!');
-//     }
-//     res.end();
-//   });
-// };
-
 exports.login = (req, res, next) => {
-  // User.findById(req.params.id, (err, user) => {
-  //   if (err) res.send(err);
-  //   res.status(200).json(user.username);
-  // });
-
   const username = req.body.username;
   const password = req.body.password;
-  // bcrypt.compare(password, )
-  if (username && password) {
-    db.query(
-      'SELECT * FROM users WHERE username = ? AND password = ?',
-      [username, password],
-      (error, results, fields) => {
-        if (results.length > 0) {
-          req.loggedin = true;
-          req.username = username;
-          res.json({
-            error: false,
-            message: `${username} user successfully signed in`,
-          });
-          // res.redirect('/home');
-        } else {
-          res.send('Incorrect Username and/or Password!');
-        }
-        res.end();
+  User.signin(username, password, (err, user) => {
+    console.log(username);
+    if (username === '' && password === '') {
+      res.send('Please enter your username and password');
+    } else if (user[0]) {
+      if (username === user[0].username && password === user[0].password) {
+        console.error(user[0].username);
+        req.loggedin = true;
+        res.json({
+          error: false,
+          message: `${user[0]['username']} user successfully signed in`,
+        });
+      } else {
+        res.send('Incorrect Username and/or Password!');
       }
-    );
-  } else {
-    res.send('Please enter Username and Password!');
-    res.end();
-  }
+      // res.redirect('/home');
+    } else {
+      res.send('Incorrect Username and/or Password!');
+    }
+    // res.end();
+  });
 };
 
 exports.updateUser = (req, res, next) => {
@@ -106,20 +80,16 @@ exports.updateUser = (req, res, next) => {
   //   if (err) res.send(err);
   //   res.status(200).json(user);
   // });
-  if (req.body.constructor === Object && Object.keys(req.body).length === 0) {
-    res
-      .status(400)
-      .send({ error: true, message: 'Please provide all required fields' });
-  } else {
-    User.update((erreur, userId) => {
-      if (erreur) res.send(err);
-      res.json({
-        error: false,
-        message: 'User updated successfully!',
-        data: userId[0],
-      });
+  const updateUser = req.body;
+  const id = req.params.id;
+
+  User.update(updateUser, id, (err, rows, fields) => {
+    if (err) res.send(err);
+    return res.status(200).json({
+      message: 'Vos information ont bien été modifié !',
+      updateUser,
     });
-  }
+  });
 };
 
 exports.signup = (req, res, next) => {
@@ -134,13 +104,13 @@ exports.signup = (req, res, next) => {
         admin: 1,
         status: 1,
       });
-      db.query('INSERT INTO users SET ?', user, (error, results, fields) => {
+      db.query('INSERT INTO users SET ?', user, (error, result, fields) => {
         if (error) {
           return res.status(400).json({ message: error });
         }
         return res
           .status(201)
-          .json({ message: 'Votre compte a bien été créé !' });
+          .json({ message: 'Votre compte a bien été créé !', result });
       });
     })
     .catch((error) => res.status(500).json({ error }));
