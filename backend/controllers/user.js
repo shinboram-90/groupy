@@ -47,80 +47,46 @@ exports.deleteUser = (req, res, next) => {
   });
 };
 
-// exports.login = (req, res, next) => {
-//   const username = req.body.username;
-//   const password = req.body.password;
-//   User.signin(username, password, (err, user) => {
-//     if (username === '' && password === '') {
-//       res.send('Please enter your username and password');
-//     } else if (user.length > 0) {
-//       req.loggedin = true;
-//       res.json({
-//         error: false,
-//         message: `${user[0]['username']} user successfully signed in`,
-//       });
-//       // res.redirect('/home');
-//     } else {
-//       res.send('Incorrect Username and/or Password!');
-//     }
-//     res.end();
-//   });
-// };
-
 exports.login = (req, res, next) => {
-  // User.findById(req.params.id, (err, user) => {
-  //   if (err) res.send(err);
-  //   res.status(200).json(user.username);
-  // });
-
   const username = req.body.username;
   const password = req.body.password;
-  // bcrypt.compare(password, )
-  if (username && password) {
-    db.query(
-      'SELECT * FROM users WHERE username = ? AND password = ?',
-      [username, password],
-      (error, results, fields) => {
-        if (results.length > 0) {
-          req.loggedin = true;
-          req.username = username;
-          res.json({
-            error: false,
-            message: `${username} user successfully signed in`,
-          });
-          // res.redirect('/home');
-        } else {
-          res.send('Incorrect Username and/or Password!');
-        }
-        res.end();
-      }
-    );
-  } else {
-    res.send('Please enter Username and Password!');
-    res.end();
-  }
-};
-
-exports.updateUser = (req, res, next) => {
-  // let updateUser = User.findById(req.params.id, (err, user) => {
-  //   if (err) res.send(err);
-  //   res.status(200).json(user);
-  // });
-  if (req.body.constructor === Object && Object.keys(req.body).length === 0) {
-    res
-      .status(400)
-      .send({ error: true, message: 'Please provide all required fields' });
-  } else {
-    User.update((erreur, userId) => {
-      if (erreur) res.send(err);
+  User.signin(username, password, (err, user) => {
+    if (username === '' && password === '') {
+      res.send('Please enter your username and password');
+    } else if (user.length > 0) {
+      req.loggedin = true;
       res.json({
         error: false,
-        message: 'User updated successfully!',
-        data: userId[0],
+        message: `${user[0]['username']} user successfully signed in`,
       });
-    });
-  }
+      // res.redirect('/home');
+    } else {
+      res.send('Incorrect username and/or password!');
+    }
+    res.end();
+  });
 };
+
+// exports.updateUser = (req, res, next) => {
+//   // let updateUser = User.findById(req.params.id, (err, user) => {
+//   //   if (err) res.send(err);
+//   //   res.status(200).json(user);
+//   // });
+//   if (req.body.constructor === Object && Object.keys(req.body).length === 0) {
+//     res
+//       .status(400)
+//       .send({ error: true, message: 'Please provide all required fields' });
+//   } else {
+//     User.update((erreur, userId) => {
+//       if (erreur) res.send(err);
+//       res.json({
+//         error: false,
+//         message: 'User updated successfully!',
+//         data: userId[0],
+//       });
+//     });
+//   }
+// };
 
 exports.signup = (req, res, next) => {
   // const cryptoEmail = crypt.MD5(req.body.email).toString();
@@ -144,4 +110,24 @@ exports.signup = (req, res, next) => {
       });
     })
     .catch((error) => res.status(500).json({ error }));
+};
+
+exports.updateUser = (req, res, next) => {
+  const email = req.body.eamil;
+  const id = req.params.id;
+  const password = req.body.password;
+  const biography = req.body.biography;
+
+  db.query(
+    `UPDATE users SET email='${email}', password='${password}', biography='${biography}'  WHERE id=?`,
+    id,
+    (error, results, fields) => {
+      if (error) {
+        return res.status(400).json(error);
+      }
+      return res
+        .status(200)
+        .json({ message: 'Vos information ont bien été modifié !' });
+    }
+  );
 };

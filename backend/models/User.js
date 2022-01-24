@@ -5,7 +5,8 @@ const passwordValidator = 'password-validator';
 
 // schemaPV.is().min(8).is().max(35);
 
-const User = (user) => {
+// ARROW FUNCTION DOESN'T WORK WHYYYYYY const User = (user) =>
+const User = function (user) {
   this.username = user.username;
   this.email = user.email;
   this.password = user.password;
@@ -79,19 +80,20 @@ User.findAll = (result) => {
   });
 };
 
-User.update = (result) => {
-  db.query(
-    `UPDATE users SET username = "COVID19", email = "testemail", password = "testpass", biography = "bloody hell" WHERE id = "13"`,
-    (err, res) => {
-      if (err) {
-        console.log('error:', err);
-        result(null, err);
-      } else {
-        console.log('User list:', res.affectedRows);
-        result(null, res);
-      }
-    }
-  );
-};
+// User.update = (id, result) => {
+//   db.query(
+//     `UPDATE users SET username=?, email=?, password=?, biography=? WHERE id =?`,
+//     [username, email, password, biography, id],
+//     (err, res) => {
+//       if (err) {
+//         console.log('error:', err);
+//         result(null, err);
+//       } else {
+//         console.log('User list:', res.affectedRows);
+//         result(null, res);
+//       }
+//     }
+//   );
+// };
 
 module.exports = User;
