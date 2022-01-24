@@ -49,12 +49,28 @@ User.signin = (username, password, result) => {
         console.error(err);
         result(err, null);
       } else {
-        console.log('Entered username:', res);
+        console.log('User info', res);
         result(null, res);
       }
     }
   );
 };
+
+// User.register = (username, email, password, admin, state, result) => {
+//   db.query(
+//     'INSERT INTO users SET username = ?, email = ?, password = ?, admin = ?, status = ?',
+//     [username, email, password, admin, state],
+//     (err, res) => {
+//       if (err) {
+//         console.error(err);
+//         result(err, null);
+//       } else {
+//         console.log('User info', res);
+//         result(null, res);
+//       }
+//     }
+//   );
+// };
 
 User.delete = (id, result) => {
   db.query('DELETE FROM users WHERE id = ?', id, (err, res) => {
@@ -79,15 +95,16 @@ User.findAll = (result) => {
   });
 };
 
-User.update = (result) => {
+User.update = (username, password, id, result) => {
   db.query(
-    `UPDATE users SET username = "COVID19", email = "testemail", password = "testpass", biography = "bloody hell" WHERE id = "13"`,
+    `UPDATE users SET username = ?, email = ?, password = ?, biography = ? WHERE id = ?`,
+    [username, email, password, biography, id],
     (err, res) => {
       if (err) {
         console.log('error:', err);
         result(null, err);
       } else {
-        console.log('User list:', res.affectedRows);
+        console.log('User list:', res);
         result(null, res);
       }
     }
