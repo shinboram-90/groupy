@@ -1,4 +1,4 @@
-const db = require('../dbConnection');
+const pool = require('../dbConnection');
 
 const passwordValidator = 'password-validator';
 // exports.schemaPV = new passwordValidator();
@@ -16,94 +16,111 @@ const User = function (user) {
   this.updated_at = new Date();
 };
 
-User.create = (newUser, result) => {
-  db.query('INSERT INTO users SET ?', newUser, (err, res) => {
-    if (err) {
-      console.error(err);
-      result(err, null);
-    } else {
-      console.log('Generated id no.:', res.insertId);
-      result(null, newUser);
-    }
-  });
-};
-
-User.findById = (id, result) => {
-  db.query('SELECT * FROM users WHERE id = ?', id, (err, res) => {
-    if (err) {
-      console.log('error: ', err);
-      result(err, null);
-    } else {
-      console.log('id', res[0]['id']);
-      result(null, res);
-    }
-  });
-};
-
-User.findByUsername = (username, result) => {
-  db.query(
-    'SELECT username FROM users WHERE username = ?',
-    username,
-    (err, res) => {
+User.create = (newUser) => {
+  return new Promise((resolve, reject) => {
+    pool.query('INSERT INTO users SET ?', newUser, (err, res) => {
       if (err) {
-        console.log('error: ', err);
-        result(err, null);
-      } else {
-        console.log('id', res[0].username);
-        result(null, res);
+        return reject(err);
       }
-    }
-  );
+      console.log(newUser);
+      return resolve(res);
+    });
+  });
 };
 
-User.signin = (username, password, result) => {
-  db.query(
-    'SELECT * FROM users WHERE username = ? AND password = ?',
-    [username, password],
-    (err, res) => {
+User.findById = (id) => {
+  return new Promise((resolve, reject) => {
+    pool.query('SELECT * FROM users WHERE id = ?', id, (err, user) => {
       if (err) {
-        console.error(err);
-        result(err, null);
-      } else {
-        console.log('Entered username:', res);
-        result(null, res);
+        return reject(err);
       }
-    }
-  );
-};
-
-User.delete = (id, result) => {
-  db.query('DELETE FROM users WHERE id = ?', id, (err, res) => {
-    if (err) {
-      console.error(err);
-      result(err, null);
-    } else {
-      result(null, res);
-    }
+      console.log(user);
+      return resolve(user);
+    });
   });
 };
 
-User.findAll = (result) => {
-  db.query('SELECT * FROM users', (err, res) => {
-    if (err) {
-      console.log('error:', err);
-      result(null, err);
-    } else {
-      console.log(res);
-      result(null, res);
-    }
+User.signin = (username, password) => {
+  return new Promise((resolve, reject) => {
+    pool.query(
+      'SELECT * FROM users WHERE username = ? AND password = ?',
+      [username, password],
+      (err, user) => {
+        if (err) {
+          return reject(err);
+        }
+        console.log(user);
+        return resolve(user);
+      }
+    );
   });
 };
 
-User.update = (user, id, result) => {
-  db.query(`UPDATE users SET ? WHERE id=?`, [user, id], (err, res) => {
-    if (err) {
-      console.log('error:', err);
-      result(null, err);
-    } else {
-      console.log('User updated:', user);
-      result(null, res);
-    }
+User.register = (user) => {
+  return new Promise((resolve, reject) => {
+    pool.query('INSERT INTO users SET ?', user, (err, res) => {
+      if (err) {
+        return reject(err);
+      }
+      console.log(user);
+      return resolve(res);
+    });
+  });
+};
+
+User.delete = (id) => {
+  return new Promise((resolve, reject) => {
+    pool.query('DELETE FROM users WHERE id = ?', id, (err, res) => {
+      if (err) {
+        return reject(err);
+      }
+      console.log(`User with id no.${id} successfully deleted`);
+      return resolve(res);
+    });
+  });
+};
+
+User.findAll = () => {
+  return new Promise((resolve, reject) => {
+    pool.query('SELECT * FROM users', (err, users) => {
+      if (err) {
+        return reject(err);
+      }
+      console.log(users);
+      return resolve(users);
+    });
+  });
+};
+
+User.update = (user, id) => {
+  return new Promise((resolve, reject) => {
+    pool.query(
+      `UPDATE users SET username=?, email=?, password=?, biography=? WHERE id=?`,
+      [user.username, user.email, user.password, user.biography, id],
+      (err, updatedUser) => {
+        if (err) {
+          return reject(err);
+        }
+        console.log('User updated:', user);
+        return resolve(updatedUser);
+      }
+    );
+  });
+};
+
+User.isValid = (username, email, password) => {
+  return new Promise((resolve, reject) => {
+    pool.query(
+      `SELECT password FROM users WHERE username = ? OR email = ?`,
+      [password, username, email],
+      (err, validUser) => {
+        if (err) {
+          return reject(err);
+        }
+        console.log('Entered credentials for:', username);
+        return resolve(validUser);
+      }
+    );
   });
 };
 

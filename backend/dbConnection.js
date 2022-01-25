@@ -1,6 +1,6 @@
 const mysql = require('mysql');
 
-const connection = mysql.createConnection({
+const pool = mysql.createPool({
   host: process.env.MYSQL_HOST,
   user: process.env.MYSQL_USER,
   // unix_socket: '/Applications/MAMP/Library/bin/mysql',
@@ -16,20 +16,11 @@ const connection = mysql.createConnection({
   database: process.env.MYSQL_DB,
 });
 
-connection.connect((err) => {
-  if (err) {
-    console.log(err);
-  } else {
-    console.log('connection created with Mysql successfully');
-  }
+pool.getConnection((err, connection) => {
+  if (err) throw err;
+  console.log(
+    `Connection created with Mysql successfully, connected as id ${connection.threadId}`
+  );
 });
 
-// connection.query('SELECT * FROM users', (err, rows) => {
-//   if (!err) {
-//     console.log(rows);
-//   } else {
-//     console.log(err);
-//   }
-// });
-
-module.exports = connection;
+module.exports = pool;
