@@ -1,6 +1,6 @@
 const bcrypt = require('bcrypt');
+const saltRounds = 10;
 const jwt = require('jsonwebtoken');
-const db = require('../dbConnection');
 const User = require('../models/User');
 const fs = require('fs');
 
@@ -49,32 +49,6 @@ exports.deleteUser = async (req, res, next) => {
   }
 };
 
-exports.login = async (req, res, next) => {
-  const username = req.body.username;
-  const password = req.body.password;
-
-  try {
-    const loggedInUser = await User.signin(username, password);
-    if (username === '' && password === '') {
-      res.send('Please enter your username and password');
-    } else if (loggedInUser[0]) {
-      if (
-        loggedInUser[0].username === username &&
-        loggedInUser[0].password === password
-      ) {
-        res.status(200).json({ user: loggedInUser });
-      } else {
-        res.send('Incorrect Username and/or Password!');
-      }
-    } else {
-      res.send('Incorrect Username and/or Password!');
-    }
-  } catch (e) {
-    console.log(e);
-    res.sendStatus(500);
-  }
-};
-
 exports.updateUser = async (req, res, next) => {
   const updateUser = req.body;
   const id = req.params.id;
@@ -87,23 +61,83 @@ exports.updateUser = async (req, res, next) => {
   }
 };
 
+//----------------- METHODE QUI MARCHE SANS BCRYPT -----------------
+// exports.login = async (req, res, next) => {
+//   const username = req.body.username;
+//   const password = req.body.password;
+
+//   try {
+//     const loggedInUser = await User.signin(username, password);
+//     if (username === '' && password === '') {
+//       res.send('Please enter your username and password');
+//     } else if (loggedInUser[0]) {
+//       if (
+//         loggedInUser[0].username === username &&
+//         loggedInUser[0].password === password
+//       ) {
+//         res.status(200).json({ user: loggedInUser });
+//       } else {
+//         res.send('Incorrect Username and/or Password!');
+//       }
+//     } else {
+//       res.send('Incorrect Username and/or Password!');
+//     }
+//   } catch (e) {
+//     console.log(e);
+//     res.sendStatus(500);
+//   }
+// };
+
 exports.signup = async (req, res, next) => {
-  // const cryptoEmail = crypt.MD5(req.body.email).toString();
-  bcrypt.hash(req.body.password, 10).then((hash) => {
+  try {
+    const hash = await bcrypt.hash(req.body.password, saltRounds);
     const user = new User({
       username: req.body.username,
       email: req.body.email,
       password: hash,
-      admin: 1,
-      status: 1,
+      role: 1,
+      is_active: true,
     });
-
-    try {
-      User.register(user);
+    const us = User.create(user);
+    if (us) {
       res.status(201).json({ RegisteredAs: user });
-    } catch (e) {
-      console.log(e);
-      res.sendStatus(500);
+    } else {
+      res.status(401).json({ 'error': e });
     }
-  });
+  } catch (e) {
+    res.sendStatus(404).json({ 'error': e });
+  }
+};
+
+exports.login = async (req, res, next) => {
+  const username = req.body.username;
+  const password = req.body.password;
+  if (username === '' && password === '') {
+    res.send('Please enter your username and password');
+  }
+  try {
+    const loggedInUser = await User.signin(username, password);
+    if (loggedInUser[0]) {
+      if (
+        loggedInUser[0].username === username &&
+        loggedInUser[0].password === password
+      ) {
+        console.log("Tout va bien jusqu'ici");
+        const match = bcrypt.compare(password, loggedInUser[0].password);
+        if (match) {
+          res.status(200).json({ user: loggedInUser });
+          console.log('Je dois arriver la');
+        } else {
+          res.send('Erreur avec Bcrypt...');
+        }
+      } else {
+        res.send('Erreur numero 2');
+      }
+    } else {
+      res.send('Bcrypt ne marche pas');
+    }
+  } catch (e) {
+    console.log(e);
+    res.sendStatus(500);
+  }
 };

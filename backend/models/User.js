@@ -9,11 +9,15 @@ const User = function (user) {
   this.username = user.username;
   this.email = user.email;
   this.password = user.password;
-  this.admin = user.admin;
+  this.role = user.role;
   this.biography = user.biography;
-  this.status = user.status;
+  this.is_active = user.is_active;
+  this.avatar = user.avatar;
   this.created_at = new Date();
   this.updated_at = new Date();
+  this.first_name = user.first_name; //optional si j'ai le temps
+  this.last_name = user.last_name; //optional
+  this.phone = user.phone; //optional
 };
 
 User.create = (newUser) => {
@@ -53,18 +57,6 @@ User.signin = (username, password) => {
         return resolve(user);
       }
     );
-  });
-};
-
-User.register = (user) => {
-  return new Promise((resolve, reject) => {
-    pool.query('INSERT INTO users SET ?', user, (err, res) => {
-      if (err) {
-        return reject(err);
-      }
-      console.log(user);
-      return resolve(res);
-    });
   });
 };
 
@@ -108,20 +100,20 @@ User.update = (user, id) => {
   });
 };
 
-User.isValid = (username, email, password) => {
-  return new Promise((resolve, reject) => {
-    pool.query(
-      `SELECT password FROM users WHERE username = ? OR email = ?`,
-      [password, username, email],
-      (err, validUser) => {
-        if (err) {
-          return reject(err);
-        }
-        console.log('Entered credentials for:', username);
-        return resolve(validUser);
-      }
-    );
-  });
-};
+// User.isValid = (username, email, password) => {
+//   return new Promise((resolve, reject) => {
+//     pool.query(
+//       `SELECT password FROM users WHERE username = ? OR email = ?`,
+//       [password, username, email],
+//       (err, validUser) => {
+//         if (err) {
+//           return reject(err);
+//         }
+//         console.log('Entered credentials for:', username);
+//         return resolve(validUser);
+//       }
+//     );
+//   });
+// };
 
 module.exports = User;
