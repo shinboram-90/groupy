@@ -1,8 +1,5 @@
 const pool = require('../dbConnection');
 
-const passwordValidator = 'password-validator';
-// exports.schemaPV = new passwordValidator();
-
 // schemaPV.is().min(8).is().max(35);
 
 const User = function (user) {
@@ -20,7 +17,7 @@ const User = function (user) {
   this.phone = user.phone; //optional
 };
 
-User.create = (newUser) => {
+User.create = async (newUser) => {
   return new Promise((resolve, reject) => {
     pool.query('INSERT INTO users SET ?', newUser, (err, res) => {
       if (err) {
@@ -44,11 +41,11 @@ User.findById = (id) => {
   });
 };
 
-User.signin = (username, password) => {
+User.signin = async (username, email) => {
   return new Promise((resolve, reject) => {
     pool.query(
-      'SELECT * FROM users WHERE username = ? AND password = ?',
-      [username, password],
+      'SELECT * FROM users WHERE username = ? OR email = ?',
+      [username, email],
       (err, user) => {
         if (err) {
           return reject(err);
@@ -72,7 +69,7 @@ User.delete = (id) => {
   });
 };
 
-User.findAll = () => {
+User.findAll = async () => {
   return new Promise((resolve, reject) => {
     pool.query('SELECT * FROM users', (err, users) => {
       if (err) {

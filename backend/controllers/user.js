@@ -4,16 +4,24 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const fs = require('fs');
 
-exports.createUser = async (req, res, next) => {
-  const newUser = new User(req.body);
-  try {
-    const createdUser = await User.create(newUser);
-    res.status(200).json({ newUser: newUser });
-  } catch (e) {
-    console.log(e);
-    res.sendStatus(500);
-  }
-};
+const passwordValidator = require('password-validator');
+
+// const pool = require('../dbConnection');
+
+// exports.createUser = async (req, res, next) => {
+//   const newUser = new User({
+//     username : req.body.username,
+//     email: req.body.email,
+//     password: req.body.password
+//   });
+//   try {
+//     const createdUser = await User.create(newUser);
+//     res.status(200).json({ newUser: newUser });
+//   } catch (e) {
+//     console.log(e);
+//     res.sendStatus(500);
+//   }
+// };
 // if (req.body.constructor === Object && Object.keys(req.body).length === 0) {
 //   res
 //     .status(400)
@@ -61,34 +69,12 @@ exports.updateUser = async (req, res, next) => {
   }
 };
 
-//----------------- METHODE QUI MARCHE SANS BCRYPT -----------------
-// exports.login = async (req, res, next) => {
-//   const username = req.body.username;
-//   const password = req.body.password;
-
-//   try {
-//     const loggedInUser = await User.signin(username, password);
-//     if (username === '' && password === '') {
-//       res.send('Please enter your username and password');
-//     } else if (loggedInUser[0]) {
-//       if (
-//         loggedInUser[0].username === username &&
-//         loggedInUser[0].password === password
-//       ) {
-//         res.status(200).json({ user: loggedInUser });
-//       } else {
-//         res.send('Incorrect Username and/or Password!');
-//       }
-//     } else {
-//       res.send('Incorrect Username and/or Password!');
-//     }
-//   } catch (e) {
-//     console.log(e);
-//     res.sendStatus(500);
-//   }
-// };
-
 exports.signup = async (req, res, next) => {
+  // const schema = new passwordValidator();
+
+  // schema.is().min(8).has().uppercase;
+  // const mypass = await schema.validate(req.body.password);
+  // if (mypass) {
   try {
     const hash = await bcrypt.hash(req.body.password, saltRounds);
     const user = new User({
@@ -98,43 +84,79 @@ exports.signup = async (req, res, next) => {
       role: 1,
       is_active: true,
     });
-    const us = User.create(user);
-    if (us) {
+    const userCreated = await User.create(user);
+    if (userCreated) {
       res.status(201).json({ RegisteredAs: user });
     } else {
-      res.status(401).json({ 'error': e });
+      res.status(401).json({ error: 'Query not completed' });
     }
   } catch (e) {
-    res.sendStatus(404).json({ 'error': e });
+    res.status(404).json({ error: 'Marked fields cannot be empty' });
   }
+  // } else {
+  //   console.log('nope');
+  // }
 };
+// exports.login = async (req, res, next) => {
+//   try {
+//     const username = req.body.username;
+//     const password = req.body.password;
+
+//     if (username && password) {
+//       pool.query(
+//         'SELECT * FROM users WHERE username = ?',
+//         username,
+//         (error, results, fields) => {
+//           if (results.length > 0) {
+//             bcrypt.compare(password, results[0].password).then((good) => {
+//               if (!good) {
+//                 res.status(401).json({ message: 'Incorrect password' });
+//               } else {
+//                 console.log(`Connected as: ${username} ${results[0].password}`);
+
+//                 res.status(200).json({
+//                   message: results,
+//                 });
+//               }
+//             });
+//           } else {
+//             res.status(401).json({ message: 'Unknown data' });
+//           }
+//         }
+//       );
+//     } else {
+//       res
+//         .status(500)
+//         .json({ message: 'Username and password cannot be blank' });
+//     }
+//   } catch (err) {
+//     console.error(`Something went wrong: ${err}`);
+//   }
+// };
 
 exports.login = async (req, res, next) => {
   const username = req.body.username;
+  const email = req.body.email;
   const password = req.body.password;
-  if (username === '' && password === '') {
-    res.send('Please enter your username and password');
+  if (
+    (username === '' && password === '') ||
+    (email === '' && password === '')
+  ) {
+    res
+      .status(401)
+      .json({ message: 'username || email and password cannot be blank' });
   }
   try {
-    const loggedInUser = await User.signin(username, password);
+    const loggedInUser = await User.signin(username, email);
     if (loggedInUser[0]) {
-      if (
-        loggedInUser[0].username === username &&
-        loggedInUser[0].password === password
-      ) {
-        console.log("Tout va bien jusqu'ici");
-        const match = bcrypt.compare(password, loggedInUser[0].password);
-        if (match) {
-          res.status(200).json({ user: loggedInUser });
-          console.log('Je dois arriver la');
-        } else {
-          res.send('Erreur avec Bcrypt...');
-        }
+      const match = await bcrypt.compare(password, loggedInUser[0].password);
+      if (match) {
+        res.status(200).json({ user: loggedInUser });
       } else {
-        res.send('Erreur numero 2');
+        res.status(400).json({ message: 'Password is incorrect' });
       }
     } else {
-      res.send('Bcrypt ne marche pas');
+      res.status(400).json({ message: 'Invalid username or email' });
     }
   } catch (e) {
     console.log(e);
