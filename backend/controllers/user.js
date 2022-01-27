@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const fs = require('fs');
 
-const passwordValidator = require('password-validator');
+// const passwordValidator = require('password-validator');
 
 // const pool = require('../dbConnection');
 

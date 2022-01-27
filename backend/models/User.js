@@ -1,7 +1,5 @@
 const pool = require('../dbConnection');
 
-// schemaPV.is().min(8).is().max(35);
-
 const User = function (user) {
   this.username = user.username;
   this.email = user.email;
@@ -38,6 +36,38 @@ User.findById = (id) => {
       console.log(user);
       return resolve(user);
     });
+  });
+};
+
+User.findByEmail = (email) => {
+  return new Promise((resolve, reject) => {
+    pool.query(
+      'SELECT email FROM users WHERE email = ?',
+      email,
+      (err, user) => {
+        if (err) {
+          return reject(err);
+        }
+        console.log(user);
+        return resolve(user);
+      }
+    );
+  });
+};
+
+User.findByUsername = (username) => {
+  return new Promise((resolve, reject) => {
+    pool.query(
+      'SELECT username FROM users WHERE username = ?',
+      username,
+      (err, user) => {
+        if (err) {
+          return reject(err);
+        }
+        console.log(user);
+        return resolve(user);
+      }
+    );
   });
 };
 
@@ -96,21 +126,5 @@ User.update = (user, id) => {
     );
   });
 };
-
-// User.isValid = (username, email, password) => {
-//   return new Promise((resolve, reject) => {
-//     pool.query(
-//       `SELECT password FROM users WHERE username = ? OR email = ?`,
-//       [password, username, email],
-//       (err, validUser) => {
-//         if (err) {
-//           return reject(err);
-//         }
-//         console.log('Entered credentials for:', username);
-//         return resolve(validUser);
-//       }
-//     );
-//   });
-// };
 
 module.exports = User;
