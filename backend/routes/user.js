@@ -3,7 +3,7 @@ const router = express.Router();
 
 const validator = require('../middleware/validator');
 
-// const auth = require('../middleware/auth');
+const auth = require('../middleware/auth');
 const multer = require('../middleware/multer-config');
 
 const userCtrl = require('../controllers/user');
@@ -12,21 +12,24 @@ router.post(
   '/signup',
   validator.checkBody,
   validator.checkRules,
+  multer,
   userCtrl.signup
 );
-// router.post('/users', userCtrl.createUser);
-router.delete('/users/:id', userCtrl.deleteUser);
 router.post('/login', userCtrl.login);
 
-router.get('/users', userCtrl.getAllUsers);
-router.get('/users/:id', userCtrl.getOneUser);
-
+// Need authentification in order to do so
+router.get('/logout', auth, userCtrl.logout);
+router.get('/users', auth, userCtrl.getAllUsers);
+router.get('/users/:id', auth, userCtrl.getOneUser);
 router.put(
   '/users/:id',
+  auth,
   validator.checkBody,
   validator.checkRules,
+  multer,
   userCtrl.updateUser
 );
+router.delete('/users/:id', auth, userCtrl.deleteUser);
 
 // router.put("/:id/admin", auth, multer, userCtrl.modifyOneUserAdmin);
 // router.put("/admin", auth, multer, userCtrl.modifyAllUsersAdmin);

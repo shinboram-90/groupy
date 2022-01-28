@@ -4,11 +4,10 @@ const User = require('../models/User');
 exports.checkBody = [
   body('username', 'Username must be a minimum of 3 characters length')
     .isLength({ min: 3 })
+    .optional()
     .trim()
     .exists()
     .escape()
-    .not()
-    .isEmpty()
     .custom(async (value) => {
       const usernameIsFree = await User.findByUsername(value);
       if (usernameIsFree.length > 0) {
@@ -19,10 +18,9 @@ exports.checkBody = [
   body('email', 'Invalid email address')
     .isEmail()
     .trim()
+    .optional()
     .exists()
     .escape()
-    .not()
-    .isEmpty()
     .normalizeEmail()
     .custom(async (value) => {
       const emailIsFree = await User.findByEmail(value);
@@ -43,25 +41,19 @@ exports.checkBody = [
     .isLength({ min: 2 })
     .optional()
     .trim()
-    .escape()
-    .not()
-    .isEmpty(),
+    .escape(),
 
   body('last_name', 'Last name must be a minimum of 2 characters length')
     .isLength({ min: 2 })
     .optional()
     .trim()
-    .escape()
-    .not()
-    .isEmpty(),
+    .escape(),
 
-  body('phone', 'Please enter a valid phone numer')
+  body('phone', 'Please enter a valid phone number')
     .isMobilePhone()
     .optional()
     .trim()
-    .escape()
-    .not()
-    .isEmpty(),
+    .escape(),
 ];
 
 exports.checkRules = (req, res, next) => {
