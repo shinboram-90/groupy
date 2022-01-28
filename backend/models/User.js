@@ -13,6 +13,7 @@ const User = function (user) {
   this.first_name = user.first_name; //optional si j'ai le temps
   this.last_name = user.last_name; //optional
   this.phone = user.phone; //optional
+  // add job if time
 };
 
 User.create = async (newUser) => {
@@ -114,8 +115,16 @@ User.findAll = async () => {
 User.update = (user, id) => {
   return new Promise((resolve, reject) => {
     pool.query(
-      `UPDATE users SET username=?, email=?, password=?, biography=? WHERE id=?`,
-      [user.username, user.email, user.password, user.biography, id],
+      `UPDATE users SET password=?, biography=?, first_name = ?, last_name = ?, phone = ?, avatar = ? WHERE id=?`,
+      [
+        user.password,
+        user.biography,
+        user.first_name,
+        user.last_name,
+        user.phone,
+        user.avatar,
+        id,
+      ],
       (err, updatedUser) => {
         if (err) {
           return reject(err);
