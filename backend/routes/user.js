@@ -8,11 +8,13 @@ const multer = require('../middleware/multer-config');
 
 const userCtrl = require('../controllers/user');
 
+// router.post('/imageupload', userCtrl.upload);
+
 router.post(
   '/signup',
   validator.checkBody,
   validator.checkRules,
-  multer,
+  // multer,
   userCtrl.signup
 );
 router.post('/login', userCtrl.login);

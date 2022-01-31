@@ -3,6 +3,7 @@ const saltRounds = 10;
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const fs = require('fs');
+const db = require('../dbConnection');
 
 // const passwordValidator = require('password-validator');
 
@@ -42,6 +43,7 @@ exports.deleteUser = async (req, res, next) => {
   try {
     const userElements = await User.delete(req.params.id);
     res.status(200).json({ message: 'User successfully deleted' });
+    console.log(resukt.affectedRows);
   } catch (e) {
     console.log(e);
     res.sendStatus(500);
@@ -49,23 +51,31 @@ exports.deleteUser = async (req, res, next) => {
 };
 
 exports.updateUser = async (req, res, next) => {
-  // const updateUser = req.file
-  //   ? {
-  //       ...JSON.parse(req.body),
-  //       avatar: `${req.protocol}://${req.get('host')}/avatar${
-  //         req.file.filename
-  //       }`,
-  //     }
-  //   : { ...req.body };
+  let userAvatar;
 
-  const id = req.params.id;
+  if (!req.file) {
+    userAvatar = `${req.protocol}://${req.get('host')}/images/${
+      req.file.filename
+    }`;
+  }
+
   try {
-    const updatedUser = await User.update(req.body, id);
-    console.log(updatedUser);
-    // = `${req.protocol}://${req.get('host')}/avatar${
-    //   req.file.filename
-    // }`;
-    res.status(200).json({ modifications: req.body });
+    const user = {
+      password: req.body.password,
+      biography: req.body.biography,
+      first_name: req.body.first_name,
+      last_name: req.body.last_name,
+      phone: req.body.phone,
+      avatar: userAvatar,
+    };
+    const id = req.params.id;
+    const updatedUser = await User.update(user, id);
+    if (updatedUser) {
+      console.log(updatedUser);
+      res.status(200).json({ modifications: req.body, image: req.file });
+    } else {
+      console.log('erreur');
+    }
   } catch (e) {
     console.log(e);
     res.sendStatus(500);
@@ -81,7 +91,6 @@ exports.signup = async (req, res, next) => {
       password: hash,
       role: 1,
       is_active: true,
-      // avatar: `${req.protocol}://${req.get('host')}/avatar${req.file.filename}`,
     });
     const userCreated = await User.create(user);
     if (userCreated) {

@@ -31,7 +31,7 @@ exports.checkBody = [
 
   body('password', 'Password must be a minimum of 8 characters length')
     .isLength({ min: 8 })
-    .exists()
+    .optional()
     .trim()
     .escape()
     .not()
