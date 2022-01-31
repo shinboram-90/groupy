@@ -6,11 +6,13 @@ const MIME_TYPES = {
   'image/png': 'png',
   'image/webp': 'webp',
   'image/heic': 'heic',
+  'image/gif': 'gif',
 };
 
 const storage = multer.diskStorage({
   destination: (req, file, callback) => {
-    callback(null, 'avatar');
+    // null as first argument means no error
+    callback(null, 'images');
   },
   filename: (req, file, callback) => {
     const name = file.originalname.split(' ').join('_');
@@ -19,4 +21,5 @@ const storage = multer.diskStorage({
   },
 });
 
-module.exports = multer({ storage }).single('image');
+// 'avatar' is the name of our file input field in the HTML form
+module.exports = multer({ storage }).single('avatar');
