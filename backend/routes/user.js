@@ -14,7 +14,6 @@ router.post(
   '/signup',
   validator.checkBody,
   validator.checkRules,
-  // multer,
   userCtrl.signup
 );
 router.post('/login', userCtrl.login);
@@ -26,9 +25,10 @@ router.get('/users/:id', auth, userCtrl.getOneUser);
 router.put(
   '/users/:id',
   auth,
+  multer,
   validator.checkBody,
   validator.checkRules,
-  multer,
+
   userCtrl.updateUser
 );
 router.delete('/users/:id', auth, userCtrl.deleteUser);

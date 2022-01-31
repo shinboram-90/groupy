@@ -51,22 +51,13 @@ exports.deleteUser = async (req, res, next) => {
 };
 
 exports.updateUser = async (req, res, next) => {
-  let userAvatar;
-
-  if (!req.file) {
-    userAvatar = `${req.protocol}://${req.get('host')}/images/${
-      req.file.filename
-    }`;
-  }
-
   try {
     const user = {
-      password: req.body.password,
-      biography: req.body.biography,
-      first_name: req.body.first_name,
-      last_name: req.body.last_name,
-      phone: req.body.phone,
-      avatar: userAvatar,
+      // retrieving all info from the req body (first_name, etc...) and adding the avatar
+      ...req.body,
+      avatar: `${req.protocol}://${req.get('host')}/images/${
+        req.file.filename
+      }`,
     };
     const id = req.params.id;
     const updatedUser = await User.update(user, id);
