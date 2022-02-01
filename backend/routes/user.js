@@ -33,7 +33,7 @@ router.put(
 );
 router.delete('/users/:id', auth, userCtrl.deleteUser);
 
-// router.put("/:id/admin", auth, multer, userCtrl.modifyOneUserAdmin);
-// router.put("/admin", auth, multer, userCtrl.modifyAllUsersAdmin);
+router.put('/admin/:id', auth, multer, userCtrl.adminUpdateStatus);
+router.get('/dashboard', auth, multer, userCtrl.adminGetAllUsers);
 
 module.exports = router;

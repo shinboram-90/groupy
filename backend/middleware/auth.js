@@ -2,7 +2,14 @@ const jwt = require('jsonwebtoken');
 
 module.exports = (req, res, next) => {
   try {
-    const token = req.headers.authorization.split(' ')[1];
+    const { cookies, headers } = req;
+    if (!cookies || !cookies.access_token) {
+      return res
+        .status(401)
+        .json({ msg: 'Missing or expired cookie, you must login again' });
+    }
+    const token = cookies.access_token;
+    // const token = req.headers.authorization.split(' ')[1];
     const decodedToken = jwt.verify(token, process.env.TOKEN_SECRET);
     const userId = decodedToken.id;
 

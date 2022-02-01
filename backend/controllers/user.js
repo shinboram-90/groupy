@@ -3,7 +3,6 @@ const saltRounds = 10;
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const fs = require('fs');
-const db = require('../dbConnection');
 
 // const passwordValidator = require('password-validator');
 
@@ -21,7 +20,7 @@ exports.logout = async (req, res, next) => {
 
 exports.getAllUsers = async (req, res, next) => {
   try {
-    const userList = await User.findAll();
+    const userList = await User.findAllActive();
     res.status(200).json({ userList: userList });
   } catch (e) {
     console.log(e);
@@ -41,9 +40,20 @@ exports.getOneUser = async (req, res, next) => {
 
 exports.deleteUser = async (req, res, next) => {
   try {
-    const userElements = await User.delete(req.params.id);
-    res.status(200).json({ message: 'User successfully deleted' });
-    console.log(resukt.affectedRows);
+    const user = await User.findById(req.params.id);
+    const avatar = user[0].avatar;
+    if (avatar) {
+      const filename = await avatar.split('/images/')[1];
+      fs.unlink(`images/${filename}`, () => {
+        const userElements = User.delete(req.params.id);
+        res.status(200).json({
+          message: 'User successfully deleted with all images',
+        });
+      });
+    } else {
+      const userElements = await User.delete(req.params.id);
+      res.status(200).json({ message: 'User successfully deleted' });
+    }
   } catch (e) {
     console.log(e);
     res.sendStatus(500);
@@ -51,6 +61,9 @@ exports.deleteUser = async (req, res, next) => {
 };
 
 exports.updateUser = async (req, res, next) => {
+  // const user = await User.findById(req.params.id);
+  // const avatar = user[0].avatar;
+
   try {
     const user = {
       // retrieving all info from the req body (first_name, etc...) and adding the avatar
@@ -62,10 +75,9 @@ exports.updateUser = async (req, res, next) => {
     const id = req.params.id;
     const updatedUser = await User.update(user, id);
     if (updatedUser) {
-      console.log(updatedUser);
       res.status(200).json({ modifications: req.body, image: req.file });
     } else {
-      console.log('erreur');
+      res.status(404).json({ message: 'Cannot modify user infos' });
     }
   } catch (e) {
     console.log(e);
@@ -135,13 +147,41 @@ exports.login = async (req, res, next) => {
           .json({
             message: 'message: Logged in successfully 😊 👌',
             user: loggedInUser,
-            token: token,
+            // token: token,
           });
       } else {
         res.status(400).json({ message: 'Password is incorrect' });
       }
     } else {
       res.status(400).json({ message: 'Invalid username or email' });
+    }
+  } catch (e) {
+    console.log(e);
+    res.sendStatus(500);
+  }
+};
+
+// ------------- ADMIN --------------
+
+exports.adminGetAllUsers = async (req, res, next) => {
+  try {
+    const userList = await User.findAll();
+    res.status(200).json({ userList: userList });
+  } catch (e) {
+    console.log(e);
+    res.sendStatus(500);
+  }
+};
+
+exports.adminUpdateStatus = async (req, res, next) => {
+  try {
+    const userList = await User.findAdmin(req.params.id);
+    if (userList) {
+      console.log(userList);
+      const findUser = await User.updateStatus(req.params.id);
+      res.status(200).json({ userList: findUser });
+    } else {
+      console.log("can't find the user");
     }
   } catch (e) {
     console.log(e);

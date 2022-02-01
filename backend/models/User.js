@@ -100,6 +100,61 @@ User.delete = (id) => {
   });
 };
 
+User.findAllActive = async () => {
+  return new Promise((resolve, reject) => {
+    pool.query(
+      'SELECT * FROM users WHERE is_active = ?',
+      ['1'],
+      (err, users) => {
+        if (err) {
+          return reject(err);
+        }
+        console.log(users);
+        return resolve(users);
+      }
+    );
+  });
+};
+
+User.update = (user, id) => {
+  return new Promise((resolve, reject) => {
+    pool.query(
+      `UPDATE users SET biography=?, first_name = ?, last_name = ?, phone = ?, avatar = ? WHERE id=?`,
+      [
+        user.biography,
+        user.first_name,
+        user.last_name,
+        user.phone,
+        user.avatar,
+        id,
+      ],
+      (err, updatedUser) => {
+        if (err) {
+          return reject(err);
+        }
+        // console.log('User updated:', user);
+        return resolve(updatedUser);
+      }
+    );
+  });
+};
+
+User.findAdmin = async (id) => {
+  return new Promise((resolve, reject) => {
+    pool.query(
+      'SELECT * FROM users WHERE role = ? and id = ?',
+      ['admin', id],
+      (err, users) => {
+        if (err) {
+          return reject(err);
+        }
+        console.log(users);
+        return resolve(users);
+      }
+    );
+  });
+};
+
 User.findAll = async () => {
   return new Promise((resolve, reject) => {
     pool.query('SELECT * FROM users', (err, users) => {
@@ -112,25 +167,17 @@ User.findAll = async () => {
   });
 };
 
-User.update = (user, id) => {
+User.updateStatus = async (id) => {
   return new Promise((resolve, reject) => {
     pool.query(
-      `UPDATE users SET password=?, biography=?, first_name = ?, last_name = ?, phone = ?, avatar = ? WHERE id=?`,
-      [
-        user.password,
-        user.biography,
-        user.first_name,
-        user.last_name,
-        user.phone,
-        user.avatar,
-        id,
-      ],
-      (err, updatedUser) => {
+      'UPDATE users SET is_active=? WHERE id=?',
+      ['2', id],
+      (err, users) => {
         if (err) {
           return reject(err);
         }
-        console.log('User updated:', user);
-        return resolve(updatedUser);
+        console.log(users);
+        return resolve(users);
       }
     );
   });
