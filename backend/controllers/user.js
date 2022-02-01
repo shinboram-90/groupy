@@ -61,23 +61,41 @@ exports.deleteUser = async (req, res, next) => {
 };
 
 exports.updateUser = async (req, res, next) => {
-  // const user = await User.findById(req.params.id);
-  // const avatar = user[0].avatar;
-
+  const id = req.params.id;
+  // building the user object, spread gets all details, just building the avatar file
+  const user = {
+    ...req.body,
+    avatar: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`,
+  };
   try {
-    const user = {
-      // retrieving all info from the req body (first_name, etc...) and adding the avatar
-      ...req.body,
-      avatar: `${req.protocol}://${req.get('host')}/images/${
-        req.file.filename
-      }`,
-    };
-    const id = req.params.id;
-    const updatedUser = await User.update(user, id);
-    if (updatedUser) {
-      res.status(200).json({ modifications: req.body, image: req.file });
+    const getUser = await User.findById(id);
+    const avatar = getUser[0].avatar;
+
+    // User already has one avatar, unlink the existing one and replace it
+    if (avatar) {
+      const filename = avatar.split('/images/')[1];
+      fs.unlink(`images/${filename}`, async () => {
+        const updatedUser = await User.update(user, id);
+        if (updatedUser) {
+          res.status(200).json({
+            modifications: req.body,
+            image: req.file,
+          });
+        } else {
+          res.status(404).json({ message: 'Cannot modify user infos' });
+        }
+      });
     } else {
-      res.status(404).json({ message: 'Cannot modify user infos' });
+      // User has no avatar
+      const updatedUser = await User.update(user, id);
+      if (updatedUser) {
+        res.status(200).json({
+          modifications: req.body,
+          image: req.file,
+        });
+      } else {
+        res.status(404).json({ message: 'Cannot modify user infos' });
+      }
     }
   } catch (e) {
     console.log(e);

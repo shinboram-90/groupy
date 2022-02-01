@@ -15,13 +15,12 @@ const storage = multer.diskStorage({
     callback(null, 'images');
   },
   filename: (req, file, callback) => {
-    const name = file.originalname.split(' ').join('_');
+    const nameSplit = file.originalname.split('.')[0];
+    const name = nameSplit.split(' ').join('_');
     const extension = MIME_TYPES[file.mimetype];
-    // enlever date pour pouvoir comparer
-    callback(null, name);
-    // callback(null, name + Date.now() + '.' + extension);
+
+    callback(null, name + Date.now() + '.' + extension);
   },
 });
 
-// 'avatar' is the name of our file input field in the HTML form
 module.exports = multer({ storage }).single('avatar');

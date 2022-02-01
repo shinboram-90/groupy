@@ -34,7 +34,7 @@ User.findById = (id) => {
       if (err) {
         return reject(err);
       }
-      console.log(user);
+      console.log(`${user[0].username} with id no.${user[0].id} found`);
       return resolve(user);
     });
   });
@@ -132,7 +132,7 @@ User.update = (user, id) => {
         if (err) {
           return reject(err);
         }
-        // console.log('User updated:', user);
+        console.log('User updated infos:', user);
         return resolve(updatedUser);
       }
     );
