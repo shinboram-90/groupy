@@ -192,14 +192,22 @@ exports.adminGetAllUsers = async (req, res, next) => {
 };
 
 exports.adminUpdateStatus = async (req, res, next) => {
+  // 1- find user by id ? n'envoit pas le req body
+  // 2- find user we want to modify ? n'envoit pas le req body
+  // 3- if user is admin we can update the user envoit ici
+  const getAdmin = await User.findById(req.params.id); // passer ici l'id  dans l'url?
+  console.error({ getAdmin });
+  console.error(req.body.id);
   try {
-    const userList = await User.findAdmin(req.params.id);
+    const userList = await User.findAdmin();
     if (userList) {
-      console.log(userList);
-      const findUser = await User.updateStatus(req.params.id);
-      res.status(200).json({ userList: findUser });
+      // passer ici l'id dans le body ??
+      const findUser = await User.updateStatus(req.body.is_active, req.body.id);
+      res
+        .status(200)
+        .json({ message: 'User status modified by Admin', user: findUser });
     } else {
-      console.log("can't find the user");
+      console.log('You are not an admin');
     }
   } catch (e) {
     console.log(e);

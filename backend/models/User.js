@@ -139,11 +139,11 @@ User.update = (user, id) => {
   });
 };
 
-User.findAdmin = async (id) => {
+User.findAdmin = async () => {
   return new Promise((resolve, reject) => {
     pool.query(
-      'SELECT * FROM users WHERE role = ? and id = ?',
-      ['admin', id],
+      'SELECT * FROM users WHERE role = ?',
+      ['admin'],
       (err, users) => {
         if (err) {
           return reject(err);
@@ -167,11 +167,11 @@ User.findAll = async () => {
   });
 };
 
-User.updateStatus = async (id) => {
+User.updateStatus = async (is_active, id) => {
   return new Promise((resolve, reject) => {
     pool.query(
       'UPDATE users SET is_active=? WHERE id=?',
-      ['2', id],
+      [is_active, id],
       (err, users) => {
         if (err) {
           return reject(err);
