@@ -46,10 +46,13 @@ exports.deleteUser = async (req, res, next) => {
     if (!user[0]) {
       return res.status(404).json({ error: 'User not found' });
     }
-    // if (user[0].id !== req.auth.userId) {
-    //   console.log(req.auth);
-    //   return res.status(403).json({ error: 'Unauthorized request.' });
-    // }
+
+    // This line allow us to verify if the same user can delete his profile
+    if (user[0].id !== req.auth.userId) {
+      return res
+        .status(403)
+        .json({ error: 'Unauthorized request, id not matching' });
+    }
     const avatar = user[0].avatar;
     if (avatar) {
       const filename = await avatar.split('/images/')[1];
