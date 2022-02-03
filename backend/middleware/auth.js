@@ -1,5 +1,4 @@
 const jwt = require('jsonwebtoken');
-const { use } = require('../routes/user');
 
 module.exports = (req, res, next) => {
   try {

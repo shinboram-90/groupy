@@ -57,13 +57,13 @@ exports.deleteUser = async (req, res, next) => {
     if (avatar) {
       const filename = await avatar.split('/images/')[1];
       fs.unlink(`images/${filename}`, () => {
-        const userElements = User.delete(req.params.id);
+        const deleteUser = User.delete(req.params.id);
         res.status(200).json({
           message: 'User successfully deleted with all images',
         });
       });
     } else {
-      const userElements = await User.delete(req.params.id);
+      const deleteUser = await User.delete(req.params.id);
       res.status(200).json({ message: 'User successfully deleted' });
     }
   } catch (e) {

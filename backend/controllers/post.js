@@ -27,22 +27,30 @@ exports.getOnePost = async (req, res, next) => {
 };
 
 exports.createPost = async (req, res, next) => {
-  let image;
-  if (req.file) {
-    let image = `${req.protocol}://${req.get('host')}/images/${
-      req.file.filename
-    }`;
-  }
   try {
     const post = new Post({
       user_id: req.body.user_id,
       title: req.body.title,
       content: req.body.content,
       status: 'published',
-      image: image,
+      image: req.files,
     });
+
+    if (req.files) {
+      await Promise.all(
+        req.files.map(async (file) => {
+          post.image = `${req.protocol}://${req.get('host')}/images/${
+            file.filename
+          }`;
+
+          console.log(post.image);
+        })
+      );
+    }
+
     const postCreated = await Post.create(post);
     if (postCreated) {
+      // /!\ CANNOT display multiple images in postman for now..
       res.status(201).json({ newPost: post });
     } else {
       res.status(401).json({ error: 'Query not completed' });
@@ -72,8 +80,10 @@ exports.modifyPost = async (req, res, next) => {
 
 exports.deletePost = async (req, res, next) => {
   try {
-    const userList = await Post.findAllActive();
-    res.status(200).json({ userList: userList });
+    const post = await Post.delete(req.params.id);
+    res.status(200).json({
+      message: 'Post successfully deleted',
+    });
   } catch (e) {
     console.log(e);
     res.sendStatus(500);
