@@ -24,3 +24,6 @@ const storage = multer.diskStorage({
 });
 
 module.exports = multer({ storage }).single('avatar');
+
+// image = post.image, maximum 5 uploads
+module.exports = multer({ storage }).array('image', 5);

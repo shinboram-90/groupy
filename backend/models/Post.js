@@ -24,35 +24,29 @@ Post.findAll = async () => {
   });
 };
 
-Post.create = async (newPost, userId) => {
+Post.create = async (newPost) => {
   return new Promise((resolve, reject) => {
-    pool.query(
-      'INSERT INTO posts SET ? where userId=?',
-      [newPost, userId],
-      (err, res) => {
-        if (err) {
-          return reject(err);
-        }
-        console.log(newPost);
-        return resolve(res);
+    pool.query('INSERT INTO posts SET ?', newPost, (err, res) => {
+      if (err) {
+        return reject(err);
       }
-    );
+      console.log('New post succesfully published');
+      return resolve(res);
+    });
   });
 };
 
-Post.findById = async (id, userId) => {
+Post.findById = async (id) => {
   return new Promise((resolve, reject) => {
-    pool.query(
-      'SELECT * FROM posts WHERE id=? and user_Id=?',
-      [id, userId],
-      (err, post) => {
-        if (err) {
-          return reject(err);
-        }
-        console.log(`${post[0].title} with id no.${post[0].id} found`);
-        return resolve(post);
+    pool.query('SELECT * FROM posts WHERE id=?', id, (err, post) => {
+      if (err) {
+        return reject(err);
       }
-    );
+      console.log(
+        `Post title: ${post[0].title} with id no.${post[0].id} found`
+      );
+      return resolve(post);
+    });
   });
 };
 
@@ -70,43 +64,39 @@ Post.findByUsername = async (post, user) => {
   );
 };
 
-Post.update = async (post, id, userId) => {
+Post.update = async (post, id) => {
   return new Promise((resolve, reject) => {
     pool.query(
-      `UPDATE posts SET title=?, content=?, image=?, WHERE id=? and user_Id =?`,
-      [post.title, post.content, post.image, id, userId],
+      `UPDATE posts SET title=?, content=?, image=?, WHERE id=?`,
+      [post.title, post.content, post.image, id],
       (err, updatedPost) => {
         if (err) {
           return reject(err);
         }
-        console.log('Post updated infos:', post);
+        console.log('Post updated infos:', updatedPost);
         return resolve(updatedPost);
       }
     );
   });
 };
 
-Post.delete = async (id, userId) => {
+Post.delete = async (id) => {
   return new Promise((resolve, reject) => {
-    pool.query(
-      'DELETE FROM posts WHERE id=? and user_Id=?',
-      [id, userId],
-      (err, res) => {
-        if (err) {
-          return reject(err);
-        }
-        console.log(`Post with id no.${id} successfully deleted`);
-        return resolve(res);
+    pool.query('DELETE FROM posts WHERE id=?', id, (err, res) => {
+      if (err) {
+        return reject(err);
       }
-    );
+      console.log(`Post with id no.${id} successfully deleted`);
+      return resolve(res);
+    });
   });
 };
 
-Post.updateLike = async (like_user_id, id, userId) => {
+Post.updateLikes = async (id, userId) => {
   return new Promise((resolve, reject) => {
     pool.query(
-      `UPDATE posts SET like_user_id=?, WHERE id=? and user_Id =?`,
-      [like_user_id, id, userId],
+      `UPDATE posts SET like_user_id = like_user_id || ?, likes = likes + 1 WHERE NOT (like_user_id @> ?) AND id = ?`,
+      [userId, id],
       (err, likePost) => {
         if (err) {
           return reject(err);
@@ -117,3 +107,5 @@ Post.updateLike = async (like_user_id, id, userId) => {
     );
   });
 };
+
+module.exports = Post;

@@ -2,7 +2,7 @@
   color: black;
   text-align: right;
   padding: 32px;
-  border-bottom: solid 3px black;
+  border-bottom: solid 3px red;
   display: flex;
   justify-content: flex-end;
   flex-direction: row;
