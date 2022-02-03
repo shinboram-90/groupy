@@ -102,17 +102,13 @@ User.delete = (id) => {
 
 User.findAllActive = async () => {
   return new Promise((resolve, reject) => {
-    pool.query(
-      'SELECT * FROM users WHERE is_active = ?',
-      ['1'],
-      (err, users) => {
-        if (err) {
-          return reject(err);
-        }
-        console.log(users);
-        return resolve(users);
+    pool.query('SELECT * FROM users WHERE is_active = ?', 1, (err, users) => {
+      if (err) {
+        return reject(err);
       }
-    );
+      console.log('Listing all active users');
+      return resolve(users);
+    });
   });
 };
 
@@ -139,21 +135,21 @@ User.update = (user, id) => {
   });
 };
 
-User.findAdmin = async () => {
-  return new Promise((resolve, reject) => {
-    pool.query(
-      'SELECT * FROM users WHERE role = ?',
-      ['admin'],
-      (err, users) => {
-        if (err) {
-          return reject(err);
-        }
-        console.log(users);
-        return resolve(users);
-      }
-    );
-  });
-};
+// User.findAdmin = async () => {
+//   return new Promise((resolve, reject) => {
+//     pool.query(
+//       'SELECT * FROM users WHERE role = ?',
+//       ['admin'],
+//       (err, users) => {
+//         if (err) {
+//           return reject(err);
+//         }
+//         console.log(users);
+//         return resolve(users);
+//       }
+//     );
+//   });
+// };
 
 User.findAll = async () => {
   return new Promise((resolve, reject) => {
@@ -161,7 +157,7 @@ User.findAll = async () => {
       if (err) {
         return reject(err);
       }
-      console.log(users);
+      console.log('Listing all users');
       return resolve(users);
     });
   });

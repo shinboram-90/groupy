@@ -18,7 +18,7 @@ exports.logout = async (req, res, next) => {
   }
 };
 
-exports.getAllUsers = async (req, res, next) => {
+exports.getAllActive = async (req, res, next) => {
   try {
     const userList = await User.findAllActive();
     res.status(200).json({ userList: userList });
@@ -32,6 +32,7 @@ exports.getOneUser = async (req, res, next) => {
   try {
     const userElements = await User.findById(req.params.id);
     res.status(200).json({ user: userElements });
+    console.log(req.auth);
   } catch (e) {
     console.log(e);
     res.sendStatus(500);
@@ -41,6 +42,14 @@ exports.getOneUser = async (req, res, next) => {
 exports.deleteUser = async (req, res, next) => {
   try {
     const user = await User.findById(req.params.id);
+    console.log(req.token);
+    if (!user[0]) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    // if (user[0].id !== req.auth.userId) {
+    //   console.log(req.auth);
+    //   return res.status(403).json({ error: 'Unauthorized request.' });
+    // }
     const avatar = user[0].avatar;
     if (avatar) {
       const filename = await avatar.split('/images/')[1];
@@ -60,7 +69,7 @@ exports.deleteUser = async (req, res, next) => {
   }
 };
 
-exports.updateUser = async (req, res, next) => {
+exports.modifyUser = async (req, res, next) => {
   const id = req.params.id;
   // building the user object, spread gets all details, just building the avatar file
   const user = {
@@ -110,7 +119,9 @@ exports.signup = async (req, res, next) => {
       username: req.body.username,
       email: req.body.email,
       password: hash,
-      role: 1,
+
+      // Set to admin for test purposes, need to change back to 1 by default : "user"
+      role: 2,
       is_active: true,
     });
     const userCreated = await User.create(user);
@@ -159,13 +170,13 @@ exports.login = async (req, res, next) => {
           .cookie('access_token', token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
-            expires: expiryDate.setMonth(expiryDate.getMonth),
+            // expires: expiryDate.setMonth(expiryDate.getMonth),
           })
           .status(200)
           .json({
             message: 'message: Logged in successfully 😊 👌',
             user: loggedInUser,
-            // token: token,
+            // tokenAdmin: token,
           });
       } else {
         res.status(400).json({ message: 'Password is incorrect' });
@@ -179,9 +190,9 @@ exports.login = async (req, res, next) => {
   }
 };
 
-// ------------- ADMIN --------------
+// ------------- ADMIN SECTION --------------
 
-exports.adminGetAllUsers = async (req, res, next) => {
+exports.getAllUsers = async (req, res, next) => {
   try {
     const userList = await User.findAll();
     res.status(200).json({ userList: userList });
@@ -191,24 +202,13 @@ exports.adminGetAllUsers = async (req, res, next) => {
   }
 };
 
-exports.adminUpdateStatus = async (req, res, next) => {
-  // 1- find user by id ? n'envoit pas le req body
-  // 2- find user we want to modify ? n'envoit pas le req body
-  // 3- if user is admin we can update the user envoit ici
-  const getAdmin = await User.findById(req.params.id); // passer ici l'id  dans l'url?
-  console.error({ getAdmin });
-  console.error(req.body.id);
+exports.modifyStatus = async (req, res, next) => {
+  // 0 is false and 1 is true
   try {
-    const userList = await User.findAdmin();
-    if (userList) {
-      // passer ici l'id dans le body ??
-      const findUser = await User.updateStatus(req.body.is_active, req.body.id);
-      res
-        .status(200)
-        .json({ message: 'User status modified by Admin', user: findUser });
-    } else {
-      console.log('You are not an admin');
-    }
+    const findUser = await User.updateStatus(req.body.is_active, req.params.id);
+    res
+      .status(200)
+      .json({ message: 'User status modified by Admin', user: findUser });
   } catch (e) {
     console.log(e);
     res.sendStatus(500);

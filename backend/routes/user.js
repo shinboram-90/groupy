@@ -4,6 +4,7 @@ const router = express.Router();
 const validator = require('../middleware/validator');
 
 const auth = require('../middleware/auth');
+const authAdmin = require('../middleware/authAdmin');
 const multer = require('../middleware/multer-config');
 
 const userCtrl = require('../controllers/user');
@@ -20,7 +21,7 @@ router.post('/login', userCtrl.login);
 
 // Need authentification in order to do so
 router.get('/logout', auth, userCtrl.logout);
-router.get('/users', auth, userCtrl.getAllUsers);
+router.get('/users', auth, userCtrl.getAllActive);
 router.get('/users/:id', auth, userCtrl.getOneUser);
 router.put(
   '/users/:id',
@@ -28,12 +29,11 @@ router.put(
   multer,
   validator.checkBody,
   validator.checkRules,
-
-  userCtrl.updateUser
+  userCtrl.modifyUser
 );
 router.delete('/users/:id', auth, userCtrl.deleteUser);
 
-router.put('/admin/:id', auth, multer, userCtrl.adminUpdateStatus);
-router.get('/dashboard', auth, multer, userCtrl.adminGetAllUsers);
+router.put('/dashboard/users/:id', authAdmin, userCtrl.modifyStatus);
+router.get('/dashboard', authAdmin, userCtrl.getAllUsers);
 
 module.exports = router;
