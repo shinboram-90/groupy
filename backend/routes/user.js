@@ -3,8 +3,8 @@ const router = express.Router();
 
 const validator = require('../middleware/validator');
 
-const auth = require('../middleware/auth');
-const authAdmin = require('../middleware/authAdmin');
+// const auth = require('../middleware/auth');
+const { auth, authAdmin } = require('../middleware/auth');
 const multer = require('../middleware/multer-config');
 
 const userCtrl = require('../controllers/user');

@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 
-module.exports = (req, res, next) => {
+exports.auth = (req, res, next) => {
   try {
     // Verify if cookies are present in the request
     const { cookies, headers } = req;
@@ -26,5 +26,28 @@ module.exports = (req, res, next) => {
     res.status(401).json({
       error: `Invalid request, check token! Id no.${req.params.id}`,
     });
+  }
+};
+
+exports.authAdmin = (req, res, next) => {
+  try {
+    const { cookies, headers } = req;
+    if (!cookies || !cookies.access_token) {
+      return res
+        .status(401)
+        .json({ msg: 'Missing or expired cookie, you must login again' });
+    }
+
+    const token = cookies.access_token;
+    const decodedToken = jwt.verify(token, process.env.TOKEN_SECRET);
+    const role = decodedToken.role;
+
+    if (role !== 'admin') {
+      throw 'NOT AN ADMIN';
+    } else {
+      next();
+    }
+  } catch {
+    return res.status(401).json({ message: 'Token not available' });
   }
 };
