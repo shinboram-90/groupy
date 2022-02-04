@@ -50,13 +50,13 @@ Post.findById = async (id) => {
   });
 };
 
-Post.findByUsername = async (post, user) => {
+Post.findByUsername = async (user) => {
   pool.query(
-    'SELECT * FROM posts JOIN users on ? = ? WHERE user.username = ?',
-    [post.user_id, user.id, user.username],
+    'SELECT * FROM posts JOIN users on post.user_id = user.id WHERE user.username = ?',
+    user.username,
     (err, postsByUsername) => {
       if (err) {
-        return reject(err);
+        return err;
       }
       console.log('All posts from a particular user' + postsByUsername);
       return resolve(postsByUsername);

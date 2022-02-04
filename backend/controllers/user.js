@@ -42,7 +42,6 @@ exports.getOneUser = async (req, res, next) => {
 exports.deleteUser = async (req, res, next) => {
   try {
     const user = await User.findById(req.params.id);
-    console.log(req.token);
     if (!user[0]) {
       return res.status(404).json({ error: 'User not found' });
     }
@@ -161,25 +160,25 @@ exports.login = async (req, res, next) => {
 
       // Password is compared with bcrypt, if true assign cookie (expires in 1 month) and token
       if (match) {
-        const expiryDate = new Date();
+        const maxAge = 72 * 60 * 60;
         const token = jwt.sign(
-          { userId: loggedInUser.id },
+          { userId: loggedInUser[0].id, role: loggedInUser[0].role },
           process.env.TOKEN_SECRET,
           {
-            expiresIn: '72h',
+            expiresIn: maxAge,
           }
         );
         res
           .cookie('access_token', token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
-            // expires: expiryDate.setMonth(expiryDate.getMonth),
+            maxAge: maxAge * 1000,
           })
           .status(200)
           .json({
             message: 'message: Logged in successfully 😊 👌',
             user: loggedInUser,
-            // tokenAdmin: token,
+            token: token,
           });
       } else {
         res.status(400).json({ message: 'Password is incorrect' });
