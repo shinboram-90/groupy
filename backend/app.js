@@ -10,8 +10,8 @@ const cookieParser = require('cookie-parser');
 require('dotenv').config();
 
 const userRoutes = require('./routes/user');
-// const postRoutes = require('./routes/post');
-// const commentRoutes = require('./routes/comment');
+const postRoutes = require('./routes/post');
+const commentRoutes = require('./routes/comment');
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -41,8 +41,8 @@ app.use(express.json());
 // app.use('/images', express.static(path.join(__dirname, 'images')));
 app.use('/avatar', express.static(path.join(__dirname, 'avatar')));
 app.use('/api', userRoutes);
-// app.use('/api', postRoutes);
-// app.use('/api/post', commentRoutes);
+app.use('/api', postRoutes);
+app.use('/api/post', commentRoutes);
 
 // Renvoie les requetes dans la console
 app.use(morgan('tiny'));

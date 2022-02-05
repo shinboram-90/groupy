@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-// const auth = require('../middleware/auth');
+// const { auth, authAdmin } = require('../middleware/auth');
 // const multer = require('../middleware/multer-config');
 
 // const commentCtrl = require('../controllers/comment');
@@ -9,7 +9,7 @@ const router = express.Router();
 // router.get('/comments', auth, commentCtrl.getAllComments);
 // router.get('/comments/:id', auth, commentCtrl.getOneComment);
 
-// router.post('/comments/:id', auth, multer, commentCtrl.createComment);
+// router.post('/comments', auth, multer, commentCtrl.createComment);
 // router.put('/comments/:id', auth, multer, commentCtrl.modifyComment);
 // router.delete('/comments/:id', auth, commentCtrl.deleteComment);
 

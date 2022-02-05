@@ -15,7 +15,7 @@ const Comment = function (comment) {
 Comment.findAll = async (post_id) => {
   return new Promise((resolve, reject) => {
     pool.query(
-      'SELECT * FROM comments WHERE post_id = ?',
+      'SELECT *, users.username FROM comments INNER JOIN users ON users.id = comments.user_id WHERE post_id = ?',
       // 'SELECT * FROM comments INNER JOIN posts ON post.id = comment.post_id LEFT JOIN users ON user.id = comment.user_id WHERE id =?',
       post_id,
       (err, comments) => {
