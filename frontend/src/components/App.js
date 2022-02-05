@@ -1,10 +1,12 @@
 import Banner from './Banner';
+import Home from './Home';
 import { Outlet, Link } from 'react-router-dom';
 
 export default function App() {
   return (
     <div className="App">
       <Banner />
+      <Home />
       <nav
         style={{
           borderBottom: 'solid 1px',
