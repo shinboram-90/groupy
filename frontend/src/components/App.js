@@ -1,10 +1,21 @@
-import Banner from "./Banner";
+import Banner from './Banner';
+import { Outlet, Link } from 'react-router-dom';
 
-function App() {
+export default function App() {
   return (
     <div className="App">
       <Banner />
-      <header className="App-header">
+      <nav
+        style={{
+          borderBottom: 'solid 1px',
+          paddingBottom: '1rem',
+        }}
+      >
+        <Link to="/users">Users</Link> | <Link to="/login">Login</Link>{' '}
+        <Link to="/signup">Signup</Link>
+      </nav>
+      <Outlet />
+      {/* <header className="App-header">
         <p>
           Edit <code>src/App.js</code> and save to reload.
         </p>
@@ -16,9 +27,7 @@ function App() {
         >
           Learn React
         </a>
-      </header>
+      </header> */}
     </div>
   );
 }
-
-export default App;

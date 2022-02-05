@@ -40,27 +40,12 @@ User.findById = (id) => {
   });
 };
 
-User.findByEmail = (email) => {
+// Test to execute a search by username
+User.search = (username) => {
   return new Promise((resolve, reject) => {
     pool.query(
-      'SELECT email FROM users WHERE email = ?',
-      email,
-      (err, user) => {
-        if (err) {
-          return reject(err);
-        }
-        console.log(user);
-        return resolve(user);
-      }
-    );
-  });
-};
-
-User.findByUsername = (username) => {
-  return new Promise((resolve, reject) => {
-    pool.query(
-      'SELECT username FROM users WHERE username = ?',
-      username,
+      'SELECT * FROM users WHERE username LIKE ?',
+      ['%' + username + '%'],
       (err, user) => {
         if (err) {
           return reject(err);
@@ -135,22 +120,6 @@ User.update = (user, id) => {
   });
 };
 
-// User.findAdmin = async () => {
-//   return new Promise((resolve, reject) => {
-//     pool.query(
-//       'SELECT * FROM users WHERE role = ?',
-//       ['admin'],
-//       (err, users) => {
-//         if (err) {
-//           return reject(err);
-//         }
-//         console.log(users);
-//         return resolve(users);
-//       }
-//     );
-//   });
-// };
-
 User.findAll = async () => {
   return new Promise((resolve, reject) => {
     pool.query('SELECT * FROM users', (err, users) => {
@@ -178,5 +147,37 @@ User.updateStatus = async (is_active, id) => {
     );
   });
 };
+
+// User.findAdmin = async () => {
+//   return new Promise((resolve, reject) => {
+//     pool.query(
+//       'SELECT * FROM users WHERE role = ?',
+//       ['admin'],
+//       (err, users) => {
+//         if (err) {
+//           return reject(err);
+//         }
+//         console.log(users);
+//         return resolve(users);
+//       }
+//     );
+//   });
+// };
+
+// User.findByEmail = (email) => {
+//   return new Promise((resolve, reject) => {
+//     pool.query(
+//       'SELECT email FROM users WHERE email = ?',
+//       email,
+//       (err, user) => {
+//         if (err) {
+//           return reject(err);
+//         }
+//         console.log(user);
+//         return resolve(user);
+//       }
+//     );
+//   });
+// };
 
 module.exports = User;

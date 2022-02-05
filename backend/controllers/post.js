@@ -100,12 +100,12 @@ exports.likePost = async (req, res, next) => {
   }
 };
 
-exports.getAllPostsUsername = async (req, res, next) => {
-  try {
-    const postList = await Post.findByUsername(req.body.username);
-    res.status(200).json({ postList: postList });
-  } catch (e) {
-    console.log(e);
-    res.sendStatus(500);
-  }
-};
+// exports.getAllPostsUsername = async (req, res, next) => {
+//   try {
+//     const postList = await Post.findByUsername(req.body.username);
+//     res.status(200).json({ postList: postList });
+//   } catch (e) {
+//     console.log(e);
+//     res.sendStatus(500);
+//   }
+// };
