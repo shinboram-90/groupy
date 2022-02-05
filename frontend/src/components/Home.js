@@ -5,7 +5,7 @@ export default function Home() {
 
   useEffect(
     () =>
-      fetch('/api/users')
+      fetch('http://localhost:3001/api/users')
         .then((res) => {
           if (res.ok) {
             return res.json();
