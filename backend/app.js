@@ -38,7 +38,7 @@ app.use(cors());
 app.use(cookieParser());
 app.use(express.json());
 
-// app.use('/images', express.static(path.join(__dirname, 'images')));
+app.use('/image', express.static(path.join(__dirname, 'image')));
 app.use('/avatar', express.static(path.join(__dirname, 'avatar')));
 app.use('/api', userRoutes);
 app.use('/api', postRoutes);

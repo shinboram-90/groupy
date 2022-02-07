@@ -12,7 +12,11 @@ const MIME_TYPES = {
 const storage = multer.diskStorage({
   destination: (req, file, callback) => {
     // null as first argument means no error
-    callback(null, 'images');
+    if (file.fieldname === 'image') {
+      callback(null, './uploads/images');
+    } else if (file.fieldname === 'avatar') {
+      callback(null, './uploads/avatars');
+    }
   },
   filename: (req, file, callback) => {
     const nameSplit = file.originalname.split('.')[0];
@@ -23,7 +27,16 @@ const storage = multer.diskStorage({
   },
 });
 
-module.exports = multer({ storage }).single('avatar');
+module.exports = multer({ storage }).fields([
+  {
+    name: 'avatar',
+    maxCount: 1,
+  },
+  {
+    name: 'image',
+    maxCount: 5,
+  },
+]);
 
 // image = post.image, maximum 5 uploads
-module.exports = multer({ storage }).array('image', 5);
+// module.exports = multer({ storage }).array('image', 5);

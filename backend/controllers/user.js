@@ -31,8 +31,8 @@ exports.getAllActive = async (req, res, next) => {
 exports.getOneUser = async (req, res, next) => {
   try {
     const userElements = await User.findById(req.params.id);
+
     res.status(200).json({ user: userElements });
-    console.log(req.auth);
   } catch (e) {
     console.log(e);
     res.sendStatus(500);
@@ -54,8 +54,8 @@ exports.deleteUser = async (req, res, next) => {
     }
     const avatar = user[0].avatar;
     if (avatar) {
-      const filename = await avatar.split('/images/')[1];
-      fs.unlink(`images/${filename}`, () => {
+      const filename = await avatar.split('/avatars/')[1];
+      fs.unlink(`uploads/avatars/${filename}`, () => {
         const deleteUser = User.delete(req.params.id);
         res.status(200).json({
           message: 'User successfully deleted with all images',
@@ -76,7 +76,9 @@ exports.modifyUser = async (req, res, next) => {
   // building the user object, spread gets all details, just building the avatar file
   const user = {
     ...req.body,
-    avatar: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`,
+    avatar: `${req.protocol}://${req.get('host')}/uploads/avatars/${
+      req.files.avatar[0].filename
+    }`,
   };
   try {
     const getUser = await User.findById(id);
@@ -84,13 +86,15 @@ exports.modifyUser = async (req, res, next) => {
 
     // User already has one avatar, unlink the existing one and replace it
     if (avatar) {
-      const filename = avatar.split('/images/')[1];
-      fs.unlink(`images/${filename}`, async () => {
+      const filename = avatar.split('avatars/')[1];
+
+      fs.unlink(`uploads/avatars/${filename}`, async () => {
         const updatedUser = await User.update(user, id);
+        // console.log(req.files.avatar);
         if (updatedUser) {
           res.status(200).json({
             modifications: req.body,
-            image: req.file,
+            avatar: req.files,
           });
         } else {
           res.status(404).json({ message: 'Cannot modify user infos' });
@@ -102,7 +106,7 @@ exports.modifyUser = async (req, res, next) => {
       if (updatedUser) {
         res.status(200).json({
           modifications: req.body,
-          image: req.file,
+          avatar: req.files,
         });
       } else {
         res.status(404).json({ message: 'Cannot modify user infos' });

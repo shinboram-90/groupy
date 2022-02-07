@@ -164,20 +164,35 @@ User.updateStatus = async (is_active, id) => {
 //   });
 // };
 
-// User.findByEmail = (email) => {
-//   return new Promise((resolve, reject) => {
-//     pool.query(
-//       'SELECT email FROM users WHERE email = ?',
-//       email,
-//       (err, user) => {
-//         if (err) {
-//           return reject(err);
-//         }
-//         console.log(user);
-//         return resolve(user);
-//       }
-//     );
-//   });
-// };
+User.findByEmail = (email) => {
+  return new Promise((resolve, reject) => {
+    pool.query(
+      'SELECT email FROM users WHERE email = ?',
+      email,
+      (err, user) => {
+        if (err) {
+          return reject(err);
+        }
+        console.log(user);
+        return resolve(user);
+      }
+    );
+  });
+};
 
+User.findByUsername = (username) => {
+  return new Promise((resolve, reject) => {
+    pool.query(
+      'SELECT username FROM users WHERE username = ?',
+      username,
+      (err, user) => {
+        if (err) {
+          return reject(err);
+        }
+        console.log(user);
+        return resolve(user);
+      }
+    );
+  });
+};
 module.exports = User;
