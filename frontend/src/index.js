@@ -26,7 +26,7 @@ render(
             </main>
           }
         />
-        <Route path=":userId" element={<User />} />
+        <Route path=":id" element={<User />} />
       </Route>
       <Route path="*" element={<NotFound />} />
     </Routes>
