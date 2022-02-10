@@ -1,12 +1,14 @@
 import { useRef, useState, useEffect } from 'react';
 import useAuth from '../hooks/useAuth';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
 
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useCookies } from 'react-cookie';
 import axios from '../api/axios';
 const LOGIN_URL = '/login';
 
 const Login = () => {
   const { setAuth } = useAuth();
+  const [cookies, setCookie] = useCookies(['access_token']);
 
   const [data, setData] = useState({
     email: '',
@@ -40,6 +42,7 @@ const Login = () => {
       setData({});
       const token = response.data.token;
       const role = response.data.user[0].role;
+      setCookie('access_token', token, { path: '/' });
       setAuth({ role, token });
       navigate(from, { replace: true });
     });
@@ -48,6 +51,7 @@ const Login = () => {
   return (
     <section>
       <h1>Login Account</h1>
+      {console.log(cookies.access_token)}
       <form onSubmit={handleSubmit}>
         <label htmlFor="email">
           Email
