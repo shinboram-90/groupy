@@ -1,19 +1,36 @@
-import { useEffect, useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { useContext } from 'react';
+import AuthContext from '../context/AuthProvider';
 
-export default function Home() {
-  const [initialState, setInitialState] = useState([]);
+const Home = () => {
+  const { setAuth } = useContext(AuthContext);
+  const navigate = useNavigate();
 
-  useEffect(
-    () =>
-      fetch('http://localhost:3001/api/users')
-        .then((res) => {
-          if (res.ok) {
-            return res.json();
-          }
-        })
-        .then((jsonresponse) => setInitialState(jsonresponse.userList)),
-    []
+  const logout = async () => {
+    // if used in more components, this should be in context
+    // axios to /logout endpoint
+    setAuth({});
+    navigate('/linkpage');
+  };
+
+  return (
+    <section>
+      <h1>Home</h1>
+      <br />
+      <p>You are logged in!</p>
+      <br />
+      <Link to="/editor">Go to the Editor page</Link>
+      <br />
+      <Link to="/admin">Go to the Admin page</Link>
+      <br />
+      <Link to="/lounge">Go to the Lounge</Link>
+      <br />
+      <Link to="/linkpage">Go to the link page</Link>
+      <div className="flexGrow">
+        <button onClick={logout}>Sign Out</button>
+      </div>
+    </section>
   );
-  console.log(initialState);
-  return <div>Hey</div>;
-}
+};
+
+export default Home;
