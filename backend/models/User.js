@@ -34,7 +34,7 @@ User.findById = (id) => {
       if (err) {
         return reject(err);
       }
-      console.log(`${user[0].username} with id no.${user[0].id} found`);
+      console.log(user);
       return resolve(user);
     });
   });

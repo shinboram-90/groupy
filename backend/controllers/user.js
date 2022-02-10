@@ -127,7 +127,7 @@ exports.signup = async (req, res, next) => {
       password: hash,
 
       // Set to admin for test purposes, need to change back to 1 by default : "user"
-      role: 2,
+      role: 1,
       is_active: true,
     });
     const userCreated = await User.create(user);
