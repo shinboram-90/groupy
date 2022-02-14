@@ -1,9 +1,9 @@
-import { useRef, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import useAuth from '../hooks/useAuth';
-
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
 import axios from '../api/axios';
+
 const LOGIN_URL = '/login';
 
 const Login = () => {
@@ -30,46 +30,47 @@ const Login = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    sendDataToAPI();
+  };
+
+  const sendDataToAPI = () => {
     const userData = {
-      email: data.email,
-      username: data.username,
-      password: data.password,
+      ...data,
     };
 
     axios.post(LOGIN_URL, userData).then((response) => {
-      console.log(response.data);
-      console.log(response.data.user[0].role);
       setData({});
+      const user = response.data.user[0];
       const token = response.data.token;
       const role = response.data.user[0].role;
       setCookie('access_token', token, { path: '/' });
-      setAuth({ role, token });
-      navigate(from, { replace: true });
+      setAuth({ user, role, token });
+      // navigate(from, { replace: true });
+      navigate('/profile');
     });
   };
 
   return (
     <section>
       <h1>Login Account</h1>
-      {console.log(cookies.access_token)}
       <form onSubmit={handleSubmit}>
-        <label htmlFor="email">
-          Email
-          <input
-            type="email"
-            name="email"
-            value={data.email || ''}
-            onChange={handleChange}
-            required
-          />
-        </label>
-
         <label htmlFor="username">
           username
           <input
             type="text"
             name="username"
             value={data.username || ''}
+            onChange={handleChange}
+            required
+          />
+        </label>
+
+        <label htmlFor="email">
+          Email
+          <input
+            type="email"
+            name="email"
+            value={data.email || ''}
             onChange={handleChange}
             required
           />
@@ -97,4 +98,5 @@ const Login = () => {
     </section>
   );
 };
+
 export default Login;

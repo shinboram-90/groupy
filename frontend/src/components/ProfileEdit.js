@@ -1,11 +1,11 @@
 import { Link } from 'react-router-dom';
 
-const Editor = () => {
+const ProfileEdit = () => {
   return (
     <section>
-      <h1>Editors Page</h1>
+      <h1>ProfileEdit Page</h1>
       <br />
-      <p>You must have been assigned an Editor role.</p>
+      <p>Fetch ProfileEdit.</p>
       <div className="flexGrow">
         <Link to="/">Home</Link>
       </div>
@@ -13,4 +13,4 @@ const Editor = () => {
   );
 };
 
-export default Editor;
+export default ProfileEdit;

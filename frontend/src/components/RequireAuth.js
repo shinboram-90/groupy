@@ -14,7 +14,7 @@ const RequireAuth = () => {
   //   );
   // };
 
-  return auth.role === 'admin' ? (
+  return auth.role === 'admin' || auth.role === 'user' ? (
     <Outlet />
   ) : auth.role === 'user' ? (
     <Navigate to="/unauthorized" state={{ from: location }} replace />
