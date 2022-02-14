@@ -20,6 +20,12 @@ const limiter = rateLimit({
 
 const app = express();
 
+const corsOptions = {
+  origin: 'http://localhost:3000',
+  credentials: true, //access-control-allow-credentials:true
+  optionSuccessStatus: 200,
+};
+
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader(
@@ -33,8 +39,8 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use(cors(corsOptions));
 app.use(helmet());
-app.use(cors());
 app.use(cookieParser());
 app.use(express.json());
 

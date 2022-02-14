@@ -3,8 +3,6 @@ import axios from "../api/axios"
 import { Outlet, useSearchParams} from "react-router-dom";
 import { Link } from "react-router-dom";
 import { useLocation, NavLink } from 'react-router-dom';
-import User from "../routes/user"
-
 
 // Keep the search filtered
 function QueryNavLink({ to, ...props }) {

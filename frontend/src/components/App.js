@@ -1,4 +1,4 @@
-import Register from './Register';
+import Signup from './Signup';
 import Login from './Login';
 import Home from './Home';
 import Layout from './Layout';
@@ -24,7 +24,7 @@ export default function App() {
       <Route path="/" element={<Layout />}>
         {/* public routes */}
         <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+        <Route path="/signup" element={<Signup />} />
         <Route path="/linkpage" element={<LinkPage />} />
         <Route path="/unauthorized" element={<Unauthorized />} />
 

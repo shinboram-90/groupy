@@ -3,7 +3,6 @@ const router = express.Router();
 
 const validator = require('../middleware/validator');
 
-// const auth = require('../middleware/auth');
 const { auth, authAdmin } = require('../middleware/auth');
 const multer = require('../middleware/multer-config');
 
@@ -21,11 +20,11 @@ router.post('/login', userCtrl.login);
 
 // Need authentification in order to do so
 router.get('/logout', auth, userCtrl.logout);
-router.get('/users', userCtrl.getAllActive);
-router.get('/users/:id', userCtrl.getOneUser);
+router.get('/users', auth, userCtrl.getAllActive);
+router.get('/users/:id', auth, userCtrl.getOneUser);
 router.put(
   '/users/:id',
-  auth,
+
   multer,
   validator.checkBody,
   validator.checkRules,
