@@ -34,7 +34,7 @@ const Signup = () => {
       ...data,
     };
     axios.post(`/signup`, userData).then(() => {
-      navigate('/login');
+      navigate('/');
     });
   };
 
@@ -69,7 +69,7 @@ const Signup = () => {
         Already registered?
         <br />
         <span className="line">
-          <Link to="/login">Sign In</Link>
+          <Link to="/">Sign In</Link>
         </span>
       </p>
     </div>

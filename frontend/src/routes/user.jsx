@@ -6,21 +6,21 @@ import axios from "../api/axios"
 
 // import { Link } from "react-router-dom";
 
-export default function User({match}) {
+export default function User() {
  const params = useParams()
   const id = params.id;
   // let navigate = useNavigate();
   const [user, setUser] = useState([]);
 
-  const modifyUser = () => {
-    axios.put(`/users/${id}`).then((response) => {
-      console.log(response);
-      setUser(response.data.user[0]);
+  // const modifyUser = () => {
+  //   axios.put(`/users/${id}`).then((response) => {
+  //     console.log(response);
+  //     setUser(response.data.user[0]);
       
-    }).catch((error) => {
-      console.log(error);
-    })
-  }
+  //   }).catch((error) => {
+  //     console.log(error);
+  //   })
+  // }
 
   useEffect(() => {
     const fetchUser = () => {
@@ -54,12 +54,9 @@ export default function User({match}) {
           //   deleteUser(user.id);
           //   navigate("/users");
           // }}
-          onClick={() => {
-            modifyUser(user.id);
-            // navigate("/users");
-          }}
+     
         >
-          Modify
+      Do sth
         </button>
       </p>
     </main>

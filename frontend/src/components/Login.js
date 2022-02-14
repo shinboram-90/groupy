@@ -39,14 +39,14 @@ const Login = () => {
     };
 
     axios.post(LOGIN_URL, userData).then((response) => {
-      console.log(response.data);
-      console.log(response.data.user[0].role);
       setData({});
+      const user = response.data.user[0];
       const token = response.data.token;
       const role = response.data.user[0].role;
       setCookie('access_token', token, { path: '/' });
-      setAuth({ role, token });
-      navigate(from, { replace: true });
+      setAuth({ user, role, token });
+      // navigate(from, { replace: true });
+      navigate('/profile');
     });
   };
 
