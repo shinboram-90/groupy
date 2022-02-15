@@ -1,3 +1,4 @@
+import { Label } from 'semantic-ui-react'
 import { useState, useEffect } from "react";
 import axios from "../api/axios"
 import { Outlet, useSearchParams} from "react-router-dom";
@@ -32,6 +33,7 @@ export default function Users() {
   return(
     <main style = {{padding: "1rem 0"}}>
     <h2>Users list</h2>
+ 
 
     <div style={{display:"flex"}}>
       <nav
@@ -69,7 +71,12 @@ export default function Users() {
        
         to={`/users/${user.id}`}
         key={user.id}>
-          {user.username}
+     
+          <Label as='a' color='blue' image>
+            <img src='https://react.semantic-ui.com/images/avatar/small/veronika.jpg' />
+            {user.username}
+            <Label.Detail>{user.role}</Label.Detail>
+          </Label>
       </QueryNavLink>
 
       ))}
