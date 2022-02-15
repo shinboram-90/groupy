@@ -1,4 +1,4 @@
-import { Label } from 'semantic-ui-react'
+import { Input, Label } from 'semantic-ui-react'
 import { useState, useEffect } from "react";
 import axios from "../api/axios"
 import { Outlet, useSearchParams} from "react-router-dom";
@@ -42,8 +42,7 @@ export default function Users() {
           padding: "1rem"
         }}
       >
-      <input
-        value = {searchParams.get("filter") || ""}
+      <Input icon='users' iconPosition='left' placeholder='Search users...' value = {searchParams.get("filter") || ""}
         onChange={event => {
           let filter = event.target.value;
           if (filter) {
@@ -53,6 +52,7 @@ export default function Users() {
           }
         }}
       />
+
       {Object.values(users).filter(user => {
         let filter = searchParams.get("filter");
         if (!filter) return true;
@@ -71,12 +71,19 @@ export default function Users() {
        
         to={`/users/${user.id}`}
         key={user.id}>
-     
+
+        {user.role==="user" ? (
           <Label as='a' color='blue' image>
             <img src='https://react.semantic-ui.com/images/avatar/small/veronika.jpg' />
             {user.username}
+
+          </Label>):( 
+          <Label as='a' color='teal' image>
+            <img src='https://react.semantic-ui.com/images/avatar/small/christian.jpg' />
+            {user.username}
             <Label.Detail>{user.role}</Label.Detail>
-          </Label>
+         </Label>)}
+         
       </QueryNavLink>
 
       ))}
