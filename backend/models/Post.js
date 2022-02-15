@@ -14,13 +14,18 @@ const Post = function (post) {
 
 Post.findAll = async () => {
   return new Promise((resolve, reject) => {
-    pool.query('SELECT * FROM posts ORDER BY created_at DESC', (err, posts) => {
-      if (err) {
-        return reject(err);
+    pool.query(
+      // 'SELECT * FROM posts ORDER BY created_at DESC',
+      'SELECT p.* FROM posts p JOIN users u ON p.user_id = u.id ORDER BY p.created_at DESC',
+
+      (err, posts) => {
+        if (err) {
+          return reject(err);
+        }
+        console.log(posts);
+        return resolve(posts);
       }
-      console.log(posts);
-      return resolve(posts);
-    });
+    );
   });
 };
 
@@ -38,36 +43,39 @@ Post.create = async (newPost) => {
 
 Post.findById = async (id) => {
   return new Promise((resolve, reject) => {
-    pool.query('SELECT * FROM posts WHERE id=?', id, (err, post) => {
-      if (err) {
-        return reject(err);
+    pool.query(
+      'SELECT p.* FROM posts p JOIN users u ON p.user_id = u.id WHERE p.id= ?',
+      id,
+      (err, post) => {
+        if (err) {
+          return reject(err);
+        }
+        console.log(post);
+        return resolve(post);
       }
-      console.log(
-        `Post title: ${post[0].title} with id no.${post[0].id} found`
-      );
-      return resolve(post);
-    });
+    );
   });
 };
 
-Post.findByUsername = async (user) => {
-  pool.query(
-    'SELECT * FROM posts JOIN users on post.user_id = user.id WHERE user.username = ?',
-    user.username,
-    (err, postsByUsername) => {
-      if (err) {
-        return err;
-      }
-      console.log('All posts from a particular user' + postsByUsername);
-      return resolve(postsByUsername);
-    }
-  );
-};
+// Post.findByUsername = async (user) => {
+//   pool.query(
+//     'SELECT * FROM posts JOIN users on user_id = users.id WHERE users.username = ?',
+//     user.username,
+//     (err, postsByUsername) => {
+//       if (err) {
+//         return err;
+//       }
+//       console.log('All posts from a particular user' + postsByUsername);
+//       return resolve(postsByUsername);
+//     }
+//   );
+// };
 
 Post.update = async (post, id) => {
   return new Promise((resolve, reject) => {
     pool.query(
-      `UPDATE posts SET title=?, content=?, image=?, WHERE id=?`,
+      // 'UPDATE posts p JOIN users u ON p.user_id = u.id SET p.title=?, p.content=?, p.image=? WHERE p.id= ?',
+      'UPDATE posts p SET p.title=?, p.content=?, p.image=? WHERE p.id= ?',
       [post.title, post.content, post.image, id],
       (err, updatedPost) => {
         if (err) {
@@ -96,6 +104,7 @@ Post.updateLikes = async (id, userId) => {
   return new Promise((resolve, reject) => {
     pool.query(
       `UPDATE posts SET like_user_id = like_user_id || ?, likes = likes + 1 WHERE NOT (like_user_id @> ?) AND id = ?`,
+      // @> If the value is contained in the array
       [userId, id],
       (err, likePost) => {
         if (err) {
@@ -107,5 +116,30 @@ Post.updateLikes = async (id, userId) => {
     );
   });
 };
+
+Post.getLikes = async (id) => {
+  return new Promise((resolve, reject) => {
+    pool.query(
+      `SELECT likes FROM posts p JOIN users u ON p.user_id = u.id WHERE p.id = ?`,
+      // @> If the value is contained in the array
+      id,
+      (err, likes) => {
+        if (err) {
+          return reject(err);
+        }
+        console.log(`total likes ${likes}`);
+        return resolve(likes);
+      }
+    );
+  });
+};
+
+// SELECT `p`.`id`, `p`.`userId`, IFNULL(`c`.`count`, 0)
+//   FROM `posts` AS `p`
+//   LEFT JOIN (
+//     SELECT `postId`, COUNT(*) AS `count`
+//       FROM `post_likes`
+//       GROUP BY `postId`
+//   ) AS `c` ON `c`.`postId` = `p`.`id`
 
 module.exports = Post;

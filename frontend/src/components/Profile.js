@@ -1,3 +1,4 @@
+import { Header, Icon, Image } from 'semantic-ui-react';
 import { Outlet, useNavigate, Link } from 'react-router-dom';
 import { useContext } from 'react';
 import useAuth from '../hooks/useAuth';
@@ -26,17 +27,23 @@ const Home = () => {
   return (
     <section>
       <Outlet />
-      <h1>My Profile</h1>
-      <br />
-      <img src="../assets/rachel.png" alt="avatar" />
-      <p>You are logged in as {auth.user.username}</p>
-      <br />
       <Link to="/edit">Update my profile</Link>
       <br />
       <Link to="/feed">Feed</Link>
       <br />
       <Link to="/users">Users</Link>
       <br />
+      <h1>My Profile</h1>
+      <br />
+      <div>
+        <Header as="h2" icon textAlign="center">
+          <Icon name="users" circular />
+          <Header.Content>
+            You are logged in as {auth.user.username}
+          </Header.Content>
+        </Header>
+        <Image centered size="large" src={auth.user.avatar} />
+      </div>
 
       <div className="flexGrow">
         <button onClick={logout}>Sign Out</button>

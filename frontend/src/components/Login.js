@@ -1,3 +1,4 @@
+import { Button, Divider, Form, Grid, Segment } from 'semantic-ui-react';
 import { useState, useEffect } from 'react';
 import useAuth from '../hooks/useAuth';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
@@ -52,8 +53,61 @@ const Login = () => {
 
   return (
     <section>
-      <h1>Login Account</h1>
-      <form onSubmit={handleSubmit}>
+      <h1>WELCOME TO GROUPOMANIA</h1>
+      <Segment placeholder>
+        <Grid columns={2} relaxed="very" stackable>
+          <Grid.Column>
+            <Form onSubmit={handleSubmit}>
+              <Form.Input
+                icon="user"
+                iconPosition="left"
+                label="Username"
+                placeholder="Username"
+                type="text"
+                name="username"
+                value={data.username || ''}
+                onChange={handleChange}
+                required
+              />
+
+              <Form.Input
+                icon="mail"
+                iconPosition="left"
+                label="Email"
+                placeholder="Email"
+                type="email"
+                name="email"
+                value={data.email || ''}
+                onChange={handleChange}
+                required
+              />
+              <Form.Input
+                icon="lock"
+                iconPosition="left"
+                label="Password"
+                placeholder="Password"
+                type="password"
+                name="password"
+                value={data.password || ''}
+                onChange={handleChange}
+                required
+              />
+
+              <Button content="Login" primary />
+            </Form>
+          </Grid.Column>
+
+          <Grid.Column verticalAlign="middle">
+            <button content="Sign up" icon="signup" size="big">
+              <Link to="/signup">Sign Up</Link>
+            </button>
+          </Grid.Column>
+        </Grid>
+
+        <Divider vertical>Or</Divider>
+      </Segment>
+
+      {/* <form onSubmit={handleSubmit}>
         <label htmlFor="username">
           username
           <input
@@ -87,14 +141,7 @@ const Login = () => {
           />
         </label>
         <button type="submit">Login</button>
-      </form>
-      <p>
-        Need an Account?
-        <br />
-        <span className="line">
-          <Link to="/signup">Sign Up</Link>
-        </span>
-      </p>
+      </form> */}
     </section>
   );
 };
