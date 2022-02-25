@@ -2,7 +2,7 @@ const bcrypt = require('bcrypt');
 const saltRounds = 10;
 const jwt = require('jsonwebtoken');
 const Post = require('../models/Post');
-const User = require('../models/User');
+const Like = require('../models/Like');
 
 const fs = require('fs');
 
@@ -27,37 +27,44 @@ exports.getOnePost = async (req, res, next) => {
 };
 
 exports.createPost = async (req, res, next) => {
-  try {
-    const post = new Post({
-      user_id: req.body.user_id,
-      title: req.body.title,
-      content: req.body.content,
-      status: 'published',
-      image: req.files,
+  let imageArray = [];
+  if (req.files) {
+    // console.log(req.files[0].filename);
+    const newFiles = req.files;
+    const imageUrl = `${req.protocol}://${req.get('host')}`;
+    newFiles.forEach((f) => {
+      // console.log(newFiles[0].filename);
+      const images = newFiles[0].filename;
+      // console.log(images);
+      // let i = 0;
+
+      // console.log(newFiles[0]);
+      imageArray.push(`${imageUrl}/images/${images}`);
+      // console.log(f[0].filename);
+      // i++;
     });
-
-    if (req.files) {
-      await Promise.all(
-        req.files.map(async (file) => {
-          post.image = `${req.protocol}://${req.get('host')}/images/${
-            file.filename
-          }`;
-
-          console.log(post.image);
-        })
-      );
-    }
-
-    const postCreated = await Post.create(post);
-    if (postCreated) {
-      // /!\ CANNOT display multiple images in postman for now..
-      res.status(201).json({ newPost: post });
-    } else {
-      res.status(401).json({ error: 'Query not completed' });
-    }
-  } catch (e) {
-    res.status(404).json({ error: 'Marked fields cannot be empty' });
   }
+
+  // try {
+  const post = await new Post({
+    user_id: req.body.user_id,
+    title: req.body.title,
+    content: req.body.content,
+    status: 'published',
+    image: imageArray,
+  });
+  console.log(imageArray);
+  console.log(post);
+
+  const postCreated = await Post.create(post);
+  if (postCreated) {
+    res.status(201).json({ newPost: post });
+  } else {
+    res.status(401).json({ error: 'Query not completed' });
+  }
+  // } catch (e) {
+  //   res.status(404).json({ error: 'Marked fields cannot be empty' });
+  // }
 };
 
 exports.modifyPost = async (req, res, next) => {
@@ -84,6 +91,18 @@ exports.deletePost = async (req, res, next) => {
     res.status(200).json({
       message: 'Post successfully deleted',
     });
+  } catch (e) {
+    console.log(e);
+    res.sendStatus(500);
+  }
+};
+
+exports.getLikes = async (req, res, next) => {
+  const postId = req.params.postId;
+  console.log(postId);
+  try {
+    const likes = await Like.find(postId);
+    res.status(200).json({ totalLikes: likes });
   } catch (e) {
     console.log(e);
     res.sendStatus(500);

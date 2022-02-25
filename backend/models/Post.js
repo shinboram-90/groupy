@@ -4,10 +4,7 @@ const Post = function (post) {
   this.user_id = post.user_id;
   this.title = post.title;
   this.content = post.content;
-  this.image = post.image;
   this.status = post.status;
-  this.likes = post.likes;
-  this.like_user_id = post.like_user_id;
   this.created_at = new Date();
   this.updated_at = new Date();
 };
@@ -26,7 +23,11 @@ Post.findAll = async () => {
 
 Post.create = async (newPost) => {
   return new Promise((resolve, reject) => {
-    pool.query('INSERT INTO posts SET ?', newPost, (err, res) => {
+    // pool.query('INSERT INTO posts SET ?', newPost, (err, res) => {
+    //   if (err) {
+    //     return reject(err);
+    //   }
+    pool.query('INSERT INTO posts (newPost) VALUES(?)'[newPost], (err, res) => {
       if (err) {
         return reject(err);
       }

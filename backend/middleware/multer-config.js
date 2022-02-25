@@ -27,16 +27,16 @@ const storage = multer.diskStorage({
   },
 });
 
-module.exports = multer({ storage }).fields([
-  {
-    name: 'avatar',
-    maxCount: 1,
-  },
-  {
-    name: 'image',
-    maxCount: 5,
-  },
-]);
+// module.exports = multer({ storage }).fields([
+//   {
+//     name: 'avatar',
+//     maxCount: 1,
+//   },
+//   {
+//     name: 'image',
+//     maxCount: 5,
+//   },
+// ]);
 
 // image = post.image, maximum 5 uploads
-// module.exports = multer({ storage }).array('image', 5);
+module.exports = multer({ storage }).array('image', 5);
