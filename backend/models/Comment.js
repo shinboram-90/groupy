@@ -14,7 +14,7 @@ const Comment = function (comment) {
 Comment.findAll = async (post_id) => {
   return new Promise((resolve, reject) => {
     pool.query(
-      'SELECT *, users.username FROM comments INNER JOIN users ON users.id = comments.user_id WHERE post_id = ?',
+      'SELECT c.*, u.username FROM comments c INNER JOIN users u ON u.id = c.user_id INNER JOIN posts p ON p.id',
       // 'SELECT * FROM comments INNER JOIN posts ON post.id = comment.post_id LEFT JOIN users ON user.id = comment.user_id WHERE id =?',
       post_id,
       (err, comments) => {
@@ -42,13 +42,17 @@ Comment.create = async (newComment) => {
 
 Comment.findById = async (id) => {
   return new Promise((resolve, reject) => {
-    pool.query('SELECT * FROM comments WHERE id=?', id, (err, comment) => {
-      if (err) {
-        return reject(err);
+    pool.query(
+      'SELECT c.*, u.username FROM comments c INNER JOIN users u ON u.id = c.user_id LEFT JOIN posts p ON p.id = c.post_id WHERE c.id=?',
+      id,
+      (err, comment) => {
+        if (err) {
+          return reject(err);
+        }
+        console.log(`Comment with id no.${comment[0].id} found`);
+        return resolve(comment);
       }
-      console.log(`Comment with id no.${comment[0].id} found`);
-      return resolve(comment);
-    });
+    );
   });
 };
 
@@ -85,8 +89,8 @@ Comment.findByUserId = async (userId) => {
 Comment.update = async (comment, id) => {
   return new Promise((resolve, reject) => {
     pool.query(
-      `UPDATE comments SET content=?, image=?, image=?, WHERE id=?`,
-      [comment.content, comment.image, id],
+      `UPDATE comments SET content=?, WHERE id=?`,
+      [comment.content, id],
       (err, updatedComment) => {
         if (err) {
           return reject(err);

@@ -4,6 +4,7 @@ const Post = function (post) {
   this.user_id = post.user_id;
   this.title = post.title;
   this.content = post.content;
+  this.image = post.image;
   this.status = post.status;
   this.created_at = new Date();
   this.updated_at = new Date();
@@ -11,26 +12,29 @@ const Post = function (post) {
 
 Post.findAll = async () => {
   return new Promise((resolve, reject) => {
-    pool.query('SELECT * FROM posts ORDER BY created_at DESC', (err, posts) => {
-      if (err) {
-        return reject(err);
+    pool.query(
+      'SELECT p.* FROM posts p JOIN users u ON p.user_id = u.id ORDER BY p.created_at DESC',
+      (err, posts) => {
+        if (err) {
+          return reject(err);
+        }
+        console.log(posts);
+        return resolve(posts);
       }
-      console.log(posts);
-      return resolve(posts);
-    });
+    );
   });
 };
 
 Post.create = async (newPost) => {
   return new Promise((resolve, reject) => {
-    // pool.query('INSERT INTO posts SET ?', newPost, (err, res) => {
-    //   if (err) {
-    //     return reject(err);
-    //   }
-    pool.query('INSERT INTO posts (newPost) VALUES(?)'[newPost], (err, res) => {
+    pool.query('INSERT INTO posts SET ?', newPost, (err, res) => {
       if (err) {
         return reject(err);
       }
+      // pool.query('INSERT INTO posts (newPost) VALUES(?)'[newPost], (err, res) => {
+      //   if (err) {
+      //     return reject(err);
+      //   }
       console.log('New post succesfully published');
       return resolve(res);
     });
@@ -90,22 +94,6 @@ Post.delete = async (id) => {
       console.log(`Post with id no.${id} successfully deleted`);
       return resolve(res);
     });
-  });
-};
-
-Post.updateLikes = async (id, userId) => {
-  return new Promise((resolve, reject) => {
-    pool.query(
-      `UPDATE posts SET like_user_id = like_user_id || ?, likes = likes + 1 WHERE NOT (like_user_id @> ?) AND id = ?`,
-      [userId, id],
-      (err, likePost) => {
-        if (err) {
-          return reject(err);
-        }
-        console.log(`Like/dislike given by user Id ${userId}`);
-        return resolve(likePost);
-      }
-    );
   });
 };
 

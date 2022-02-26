@@ -1,6 +1,3 @@
-const bcrypt = require('bcrypt');
-const saltRounds = 10;
-const jwt = require('jsonwebtoken');
 const Post = require('../models/Post');
 const Like = require('../models/Like');
 
@@ -29,31 +26,24 @@ exports.getOnePost = async (req, res, next) => {
 exports.createPost = async (req, res, next) => {
   let imageArray = [];
   if (req.files) {
-    // console.log(req.files[0].filename);
-    const newFiles = req.files;
+    // console.log(req.files.image[0].filename);
+
+    const newFiles = Object.values(req.files.image);
     const imageUrl = `${req.protocol}://${req.get('host')}`;
     newFiles.forEach((f) => {
-      // console.log(newFiles[0].filename);
-      const images = newFiles[0].filename;
-      // console.log(images);
-      // let i = 0;
-
-      // console.log(newFiles[0]);
-      imageArray.push(`${imageUrl}/images/${images}`);
-      // console.log(f[0].filename);
-      // i++;
+      imageArray.push(`${imageUrl}/images/${f.filename}`);
     });
   }
 
   // try {
-  const post = await new Post({
+  const post = new Post({
     user_id: req.body.user_id,
     title: req.body.title,
     content: req.body.content,
     status: 'published',
-    image: imageArray,
+    image: JSON.stringify(imageArray),
   });
-  console.log(imageArray);
+  // console.log(imageArray);
   console.log(post);
 
   const postCreated = await Post.create(post);
@@ -98,7 +88,7 @@ exports.deletePost = async (req, res, next) => {
 };
 
 exports.getLikes = async (req, res, next) => {
-  const postId = req.params.postId;
+  const postId = req.params.id;
   console.log(postId);
   try {
     const likes = await Like.find(postId);
@@ -109,20 +99,75 @@ exports.getLikes = async (req, res, next) => {
   }
 };
 
-exports.likePost = async (req, res, next) => {
+exports.updateLike = async (req, res, next) => {
+  const postId = req.params.id;
+  const userId = req.body.user_id;
+  const like = new Like({
+    user_id: userId,
+    post_id: postId,
+    is_liked: 1,
+  });
+
   try {
-    const userList = await Post.findAllActive();
-    res.status(200).json({ userList: userList });
+    let findUserLike = await Like.findByUser(postId, userId);
+    if (findUserLike.length !== 1) {
+      try {
+        findUserLike = await Like.create(like);
+        res.status(200).json({ userFirstLike: findUserLike });
+      } catch (e) {
+        console.log(e);
+        res.sendStatus(500);
+      }
+    } else {
+      try {
+        if (findUserLike[0].is_liked === 1) {
+          findUserLike = await Like.dislikeUpdate(postId, userId);
+          console.log(findUserLike);
+          res.status(200).json({ userLike: findUserLike });
+        } else {
+          findUserLike = await Like.likeUpdate(postId, userId);
+          console.log(findUserLike);
+          res.status(200).json({ userLike: findUserLike });
+        }
+      } catch (e) {
+        console.log(e);
+        res.sendStatus(500);
+      }
+    }
   } catch (e) {
     console.log(e);
     res.sendStatus(500);
   }
 };
 
-// exports.getAllPostsUsername = async (req, res, next) => {
+// exports.likePost = async (req, res, next) => {
+//   const postId = req.params.id;
+//   const like = new Like({
+//     user_id: req.body.user_id,
+//     post_id: postId,
+//     is_liked: true,
+//   });
+//   // const userLike = req.body.is_Liked;
+//   // const postId = req.params.id;
 //   try {
-//     const postList = await Post.findByUsername(req.body.username);
-//     res.status(200).json({ postList: postList });
+//     const userGivesLike = await Like.create(like);
+//     res.status(200).json({ userLike: userGivesLike });
+//   } catch (e) {
+//     console.log(e);
+//     res.sendStatus(500);
+//   }
+// };
+
+// exports.updateLike = async (req, res, next) => {
+//   const postId = req.params.id;
+//   const like = new Like({
+//     user_id: req.body.user_id,
+//     post_id: postId,
+//     is_liked: 1,
+//   });
+//   try {
+//     const userChoice = await Like.likeUpdate(postId);
+//     res.status(200).json({ userLike: userChoice });
 //   } catch (e) {
 //     console.log(e);
 //     res.sendStatus(500);
