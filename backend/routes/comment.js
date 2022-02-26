@@ -1,15 +1,14 @@
 const express = require('express');
 const router = express.Router();
 
-// const { auth, authAdmin } = require('../middleware/auth');
-// const multer = require('../middleware/multer-config');
+const { auth, authAdmin } = require('../middleware/auth');
 
-// const commentCtrl = require('../controllers/comment');
+const commentCtrl = require('../controllers/comment');
 
-// router.get('/comments', auth, commentCtrl.getAllComments);
-// router.get('/comments/:id', auth, commentCtrl.getOneComment);
+router.get('/comments', auth, commentCtrl.getAllComments);
+router.get('/comments/:id', auth, commentCtrl.getOneComment);
 
-// router.post('/comments', auth, multer, commentCtrl.createComment);
+router.post('/comments', commentCtrl.createComment);
 // router.put('/comments/:id', auth, multer, commentCtrl.modifyComment);
 // router.delete('/comments/:id', auth, commentCtrl.deleteComment);
 

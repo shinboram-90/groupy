@@ -11,12 +11,11 @@ const Comment = function (comment) {
   this.updated_at = new Date();
 };
 
-Comment.findAll = async (post_id) => {
+Comment.findAll = async () => {
   return new Promise((resolve, reject) => {
     pool.query(
       'SELECT c.*, u.username FROM comments c INNER JOIN users u ON u.id = c.user_id INNER JOIN posts p ON p.id',
-      // 'SELECT * FROM comments INNER JOIN posts ON post.id = comment.post_id LEFT JOIN users ON user.id = comment.user_id WHERE id =?',
-      post_id,
+
       (err, comments) => {
         if (err) {
           return reject(err);
@@ -102,15 +101,19 @@ Comment.update = async (comment, id) => {
   });
 };
 
-Comment.delete = async (id) => {
+Comment.delete = async (id, post_id) => {
   return new Promise((resolve, reject) => {
-    pool.query('DELETE FROM comments WHERE id=?', id, (err, res) => {
-      if (err) {
-        return reject(err);
+    pool.query(
+      'DELETE FROM comments WHERE id=? AND post_id =?',
+      [id, post_id],
+      (err, res) => {
+        if (err) {
+          return reject(err);
+        }
+        console.log(`Comment with id no.${id} successfully deleted`);
+        return resolve(res);
       }
-      console.log(`Comment with id no.${id} successfully deleted`);
-      return resolve(res);
-    });
+    );
   });
 };
 

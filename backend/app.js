@@ -27,7 +27,7 @@ const corsOptions = {
 };
 
 app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  // res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader(
     'Access-Control-Allow-Headers',
     'Origin, X-Requested-With, Content, Accept, Content-Type, Authorization'
@@ -44,8 +44,8 @@ app.use(helmet());
 app.use(cookieParser());
 app.use(express.json());
 
-app.use('/image', express.static(path.join(__dirname, 'image')));
-app.use('/avatar', express.static(path.join(__dirname, 'avatar')));
+app.use('/images', express.static(path.join(__dirname, '/uploads/images')));
+app.use('/avatars', express.static(path.join(__dirname, '/uploads/avatars')));
 app.use('/api', userRoutes);
 app.use('/api', postRoutes);
 app.use('/api/post', commentRoutes);
