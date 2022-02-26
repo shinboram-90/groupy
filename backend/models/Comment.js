@@ -5,7 +5,6 @@ const Comment = function (comment) {
   this.post_id = comment.post_id;
   this.status = comment.status;
   this.content = comment.content;
-  this.image = comment.image;
   this.likes = comment.likes;
   this.like_user_id = comment.like_user_id;
   this.created_at = new Date();
@@ -89,8 +88,8 @@ Comment.findByUserId = async (userId) => {
 Comment.update = async (comment, id) => {
   return new Promise((resolve, reject) => {
     pool.query(
-      `UPDATE comments SET content=?, image=?, image=?, WHERE id=?`,
-      [comment.content, comment.image, id],
+      `UPDATE comments SET content=?, WHERE id=?`,
+      [comment.content, id],
       (err, updatedComment) => {
         if (err) {
           return reject(err);

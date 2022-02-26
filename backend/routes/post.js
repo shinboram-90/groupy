@@ -14,8 +14,10 @@ router.post('/posts', auth, multer, postCtrl.createPost);
 router.put('/posts/:id', auth, multer, postCtrl.modifyPost);
 router.delete('/posts/:id', auth, postCtrl.deletePost);
 
-router.get('posts/likes/:id', auth, postCtrl.getlikesPost);
-router.put('posts/likes/:id', auth, postCtrl.likePost);
+
+router.get('/posts/:id/likes', auth, postCtrl.getLikes);
+// router.post('/posts/:id/likes', auth, postCtrl.likePost);
+router.post('/posts/:id/likes', auth, postCtrl.updateLike);
 
 // router.put("/:id/admin", auth, multer, postCtrl.modifyOnepostAdmin);
 // router.put("/admin", auth, multer, postCtrl.modifyAllpostsAdmin);

@@ -14,6 +14,7 @@ const pool = mysql.createPool({
   port: process.env.MYSQL_PORT,
   password: process.env.MYSQL_PASS,
   database: process.env.MYSQL_DB,
+  multipleStatements: true,
 });
 
 pool.getConnection((err, connection) => {
