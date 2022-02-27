@@ -92,15 +92,24 @@ exports.modifyPost = async (req, res, next) => {
 
     // Post already has image(s), unlink the existing one(s) and replace it/them
     if (image) {
+      // let imageArray = [];
+      // const newFiles = Object.values(req.files.image);
+      // const imageUrl = `${req.protocol}://${req.get('host')}`;
+      // newFiles.forEach((f) => {
+      //   imageArray.push(`${imageUrl}/images/${f.filename}`);
+      // });
+
       objectImage = eval(image);
-      const filenames = objectImage.map((filename) => {
-        filename.split('images/')[1];
-        const path = `uploads/images/${filename}`;
-        console.log(path);
-        // fs.unlink(path);
-      });
-      // console.log(filenames);
+      //   const filenames = objectImage.map((filename) => {
+      //     myFile = filename.split('images/')[1];
+      //     console.log(myFile);
+      //   });
+      //   console.log(filenames);
+      for (let i in objectImage) {
+        console.log(i);
+      }
     }
+
     //     fs.unlink(`uploads/images/${filename}`, async () => {
     //       const updatedPost = await Post.update(post, id);
     //       // console.log(req.files.image);
