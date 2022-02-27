@@ -35,40 +35,98 @@ exports.createPost = async (req, res, next) => {
     });
   }
 
-  // try {
-  const post = new Post({
-    user_id: req.body.user_id,
-    title: req.body.title,
-    content: req.body.content,
-    status: 'published',
-    image: JSON.stringify(imageArray),
-  });
-  // console.log(imageArray);
-  console.log(post);
+  try {
+    const post = new Post({
+      user_id: req.body.user_id,
+      title: req.body.title,
+      content: req.body.content,
+      status: 'published',
+      image: JSON.stringify(imageArray),
+    });
+    // console.log(imageArray);
+    console.log(post);
 
-  const postCreated = await Post.create(post);
-  if (postCreated) {
-    res.status(201).json({ newPost: post });
-  } else {
-    res.status(401).json({ error: 'Query not completed' });
+    const postCreated = await Post.create(post);
+    if (postCreated) {
+      res.status(201).json({ newPost: post });
+    } else {
+      res.status(401).json({ error: 'Query not completed' });
+    }
+  } catch (e) {
+    res.status(404).json({ error: 'Marked fields cannot be empty' });
   }
-  // } catch (e) {
-  //   res.status(404).json({ error: 'Marked fields cannot be empty' });
-  // }
 };
 
+// exports.modifyPost = async (req, res, next) => {
+//   // const post = {
+//   //   ...req.body,
+//   //   image: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`,
+//   // };
+
+//   try {
+//     const getPost = await Post.findById(req.params.id);
+//     const upload = getPost[0];
+
+//     res.status(200).json({ modifiedPost: upload });
+//     console.log(req.file);
+//   } catch (e) {
+//     console.log(e);
+//     res.sendStatus(500);
+//   }
+// };
+
 exports.modifyPost = async (req, res, next) => {
-  // const post = {
-  //   ...req.body,
-  //   image: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`,
-  // };
+  const id = req.params.id;
+  // building the user object, spread gets all details, just building the avatar file
+  const post = {
+    ...req.body,
+    image: `${req.protocol}://${req.get('host')}/uploads/images/${
+      req.files.image[0].filename
+    }`,
+  };
 
   try {
-    const getPost = await Post.findById(req.params.id);
-    const upload = getPost[0];
+    const getPost = await Post.findById(id);
+    const image = getPost[0].image;
+    console.log(eval(image));
 
-    res.status(200).json({ modifiedPost: upload });
-    console.log(req.file);
+    // Post already has image(s), unlink the existing one(s) and replace it/them
+    if (image) {
+      objectImage = eval(image);
+      const filenames = objectImage.map((filename) => {
+        filename.split('images/')[1];
+        const path = `uploads/images/${filename}`;
+        console.log(path);
+        // fs.unlink(path);
+      });
+      // console.log(filenames);
+    }
+    //     fs.unlink(`uploads/images/${filename}`, async () => {
+    //       const updatedPost = await Post.update(post, id);
+    //       // console.log(req.files.image);
+    //       if (updatedPost) {
+    //         res.status(200).json({
+    //           modifications: req.body,
+    //           image: req.files,
+    //         });
+    //       } else {
+    //         res.status(404).json({ message: 'Cannot modify post infos' });
+    //       }
+    //     });
+    // }
+
+    // } else {
+    //   // Post has no image
+    //   const updatedPost = await Post.update(post, id);
+    //   if (updatedPost) {
+    //     res.status(200).json({
+    //       modifications: req.body,
+    //       image: req.files,
+    //     });
+    //   } else {
+    //     res.status(404).json({ message: 'Cannot modify post infos' });
+    //   }
+    // }
   } catch (e) {
     console.log(e);
     res.sendStatus(500);
@@ -77,15 +135,37 @@ exports.modifyPost = async (req, res, next) => {
 
 exports.deletePost = async (req, res, next) => {
   try {
-    const post = await Post.delete(req.params.id);
-    res.status(200).json({
-      message: 'Post successfully deleted',
-    });
+    const post = await Post.findById(req.params.id);
+    if (!post[0]) {
+      return res.status(404).json({ error: 'Post not found' });
+    }
+
+    // This line allow us to verify if the post's owner can delete his post
+    if (post[0].user_id !== req.auth.userId) {
+      return res
+        .status(403)
+        .json({ error: 'Unauthorized request, id not matching' });
+    }
+    const image = post[0].image;
+    if (image) {
+      const filename = await image.split('/images/')[1];
+      fs.unlink(`uploads/images/${filename}`, () => {
+        const deletePost = Post.delete(req.params.id);
+        res.status(200).json({
+          message: 'Post successfully deleted with all images',
+        });
+      });
+    } else {
+      const deletePost = await Post.delete(req.params.id);
+      res.status(200).json({ message: 'Post successfully deleted' });
+    }
   } catch (e) {
     console.log(e);
     res.sendStatus(500);
   }
 };
+
+// <------------------- HANDLING LIKES ------------------->
 
 exports.getLikes = async (req, res, next) => {
   const postId = req.params.id;
@@ -99,9 +179,10 @@ exports.getLikes = async (req, res, next) => {
   }
 };
 
-exports.updateLike = async (req, res, next) => {
+exports.giveLike = async (req, res, next) => {
   const postId = req.params.id;
   const userId = req.body.user_id;
+
   const like = new Like({
     user_id: userId,
     post_id: postId,
@@ -109,7 +190,10 @@ exports.updateLike = async (req, res, next) => {
   });
 
   try {
+    // Need to find out if the user has already liked the post or not
     let findUserLike = await Like.findByUser(postId, userId);
+
+    // The user hasn't liked any posts yet
     if (findUserLike.length !== 1) {
       try {
         findUserLike = await Like.create(like);
@@ -119,16 +203,11 @@ exports.updateLike = async (req, res, next) => {
         res.sendStatus(500);
       }
     } else {
+      // Already liked/disliked one post, will update the boolean value
       try {
-        if (findUserLike[0].is_liked === 1) {
-          findUserLike = await Like.dislikeUpdate(postId, userId);
-          console.log(findUserLike);
-          res.status(200).json({ userLike: findUserLike });
-        } else {
-          findUserLike = await Like.likeUpdate(postId, userId);
-          console.log(findUserLike);
-          res.status(200).json({ userLike: findUserLike });
-        }
+        findUserLike = await Like.likeUpdate(postId, userId);
+        console.log(findUserLike);
+        res.status(200).json({ userLike: findUserLike });
       } catch (e) {
         console.log(e);
         res.sendStatus(500);
@@ -139,37 +218,3 @@ exports.updateLike = async (req, res, next) => {
     res.sendStatus(500);
   }
 };
-
-// exports.likePost = async (req, res, next) => {
-//   const postId = req.params.id;
-//   const like = new Like({
-//     user_id: req.body.user_id,
-//     post_id: postId,
-//     is_liked: true,
-//   });
-//   // const userLike = req.body.is_Liked;
-//   // const postId = req.params.id;
-//   try {
-//     const userGivesLike = await Like.create(like);
-//     res.status(200).json({ userLike: userGivesLike });
-//   } catch (e) {
-//     console.log(e);
-//     res.sendStatus(500);
-//   }
-// };
-
-// exports.updateLike = async (req, res, next) => {
-//   const postId = req.params.id;
-//   const like = new Like({
-//     user_id: req.body.user_id,
-//     post_id: postId,
-//     is_liked: 1,
-//   });
-//   try {
-//     const userChoice = await Like.likeUpdate(postId);
-//     res.status(200).json({ userLike: userChoice });
-//   } catch (e) {
-//     console.log(e);
-//     res.sendStatus(500);
-//   }
-// };

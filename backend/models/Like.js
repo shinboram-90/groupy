@@ -53,27 +53,7 @@ Like.create = async (like) => {
 Like.likeUpdate = async (postId, userId) => {
   return new Promise((resolve, reject) => {
     pool.query(
-      // 'UPDATE likes l INNER JOIN users u ON u.id = l.user_id INNER JOIN posts p ON p.id = l.post_id SET l.is_liked = (CASE WHEN l.is_Liked = 1 THEN 1 ELSE 0 END) WHERE p.id = ?',
-      'UPDATE likes l INNER JOIN users u ON l.user_id = u.id INNER JOIN posts p ON p.id = l.post_id SET l.is_liked = 1 WHERE p.id = ? AND u.id = ?',
-
-      [postId, userId],
-      (err, res) => {
-        if (err) {
-          return reject(err);
-        }
-        console.log(res);
-        return resolve(res);
-      }
-    );
-  });
-};
-
-Like.dislikeUpdate = async (postId, userId) => {
-  return new Promise((resolve, reject) => {
-    pool.query(
-      // 'UPDATE likes l INNER JOIN users u ON u.id = l.user_id INNER JOIN posts p ON p.id = l.post_id SET l.is_liked = (CASE WHEN l.isLiked = 0 THEN 1 else 0 END) WHERE p.id = ?',
-      'UPDATE likes l INNER JOIN users u ON l.user_id = u.id INNER JOIN posts p ON p.id = l.post_id SET l.is_liked = 0 WHERE p.id = ?  AND u.id = ?',
-
+      'UPDATE likes l INNER JOIN users u ON u.id = l.user_id INNER JOIN posts p ON p.id = l.post_id SET l.is_liked = (CASE WHEN l.is_Liked = 1 THEN 0 ELSE 1 END) WHERE p.id = ? AND u.id = ?',
       [postId, userId],
       (err, res) => {
         if (err) {

@@ -13,7 +13,7 @@ const Post = function (post) {
 Post.findAll = async () => {
   return new Promise((resolve, reject) => {
     pool.query(
-      'SELECT p.* FROM posts p JOIN users u ON p.user_id = u.id ORDER BY p.created_at DESC',
+      'SELECT p.*, u.avatar, u.username FROM posts p JOIN users u ON p.user_id = u.id ORDER BY p.created_at DESC',
       (err, posts) => {
         if (err) {
           return reject(err);
@@ -43,15 +43,17 @@ Post.create = async (newPost) => {
 
 Post.findById = async (id) => {
   return new Promise((resolve, reject) => {
-    pool.query('SELECT * FROM posts WHERE id=?', id, (err, post) => {
-      if (err) {
-        return reject(err);
+    pool.query(
+      'SELECT  p.*, u.avatar, u.username FROM posts p JOIN users u ON p.user_id = u.id WHERE p.id=? ORDER BY p.created_at DESC',
+      id,
+      (err, post) => {
+        if (err) {
+          return reject(err);
+        }
+        console.log(post);
+        return resolve(post);
       }
-      console.log(
-        `Post title: ${post[0].title} with id no.${post[0].id} found`
-      );
-      return resolve(post);
-    });
+    );
   });
 };
 
