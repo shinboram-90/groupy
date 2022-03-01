@@ -27,7 +27,7 @@ exports.getAllCommentsUser = async (req, res, next) => {
   const userId = req.params.userId;
   console.log(req.params.id);
   try {
-    const commentList = await Comment.findByUsername(userId);
+    const commentList = await Comment.findByUser(userId);
     res.status(200).json({ commentList: commentList });
   } catch (e) {
     console.log(e);

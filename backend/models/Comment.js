@@ -38,7 +38,7 @@ Comment.create = async (newComment) => {
   });
 };
 
-Comment.findByUsername = async (userId) => {
+Comment.findByUser = async (userId) => {
   return new Promise((resolve, reject) => {
     pool.query(
       'SELECT c.*, u.username FROM comments c INNER JOIN users u ON u.id = c.user_id LEFT JOIN posts p ON p.id = c.post_id WHERE u.id=? ORDER BY c.created_at DESC',
@@ -47,7 +47,7 @@ Comment.findByUsername = async (userId) => {
         if (err) {
           return reject(err);
         }
-        console.log(`Comment with id no.${comment[0].id} found`);
+        console.log(comment);
         return resolve(comment);
       }
     );
