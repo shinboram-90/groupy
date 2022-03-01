@@ -10,7 +10,7 @@ router.post('/posts/:postId/comments/', auth, commentCtrl.createComment);
 router.put('/posts/:postId/comments/:id', auth, commentCtrl.modifyComment);
 router.delete('/posts/:postId/comments/:id', auth, commentCtrl.deleteComment);
 
-// router.get('/posts/comments/', auth, commentCtrl.countComments);
+router.get('/popular/posts/comments/', auth, commentCtrl.countComments);
 
 router.get('/users/:userId/comments/', auth, commentCtrl.getAllCommentsUser);
 // router.get('/users/:userId/comments/', auth, commentCtrl.getAllCommentsUser);

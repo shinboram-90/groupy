@@ -54,21 +54,21 @@ Comment.findByUsername = async (userId) => {
   });
 };
 
-// Comment.countComments = async () => {
-//   return new Promise((resolve, reject) => {
-//     pool.query(
-//       'SELECT p.id, COUNT c.id total FROM posts p, comments c WHERE p.id = c.post_id GROUP BY p.id ORDER BY c  LIMIT 10',
+Comment.countComments = async () => {
+  return new Promise((resolve, reject) => {
+    pool.query(
+      'SELECT p.title, p.id, COUNT(c.id) total FROM comments c INNER JOIN posts p ON p.id = c.post_id GROUP BY p.id ORDER BY total DESC LIMIT 10',
 
-//       (err, comment) => {
-//         if (err) {
-//           return reject(err);
-//         }
-//         console.log(comment);
-//         return resolve(comment);
-//       }
-//     );
-//   });
-// };
+      (err, count) => {
+        if (err) {
+          return reject(err);
+        }
+        console.log(count);
+        return resolve(count);
+      }
+    );
+  });
+};
 
 Comment.findById = async (id) => {
   return new Promise((resolve, reject) => {

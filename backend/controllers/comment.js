@@ -15,8 +15,8 @@ exports.getAllComments = async (req, res, next) => {
 
 exports.countComments = async (req, res, next) => {
   try {
-    const count = await Comment.countComments;
-    res.status(200).json({ count: count });
+    const counting = await Comment.countComments();
+    res.status(200).json({ message: counting });
   } catch (e) {
     console.log(e);
     res.sendStatus(500);
