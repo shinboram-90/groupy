@@ -1,11 +1,11 @@
 const Post = require('../models/Post');
 const Like = require('../models/Like');
-
 const fs = require('fs');
 
 exports.getAllPosts = async (req, res, next) => {
+  const postId = req.params.id;
   try {
-    const postList = await Post.findAll();
+    const postList = await Post.findAll(postId);
     res.status(200).json({ postList: postList });
   } catch (e) {
     console.log(e);
@@ -57,85 +57,65 @@ exports.createPost = async (req, res, next) => {
   }
 };
 
-// exports.modifyPost = async (req, res, next) => {
-//   // const post = {
-//   //   ...req.body,
-//   //   image: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`,
-//   // };
-
-//   try {
-//     const getPost = await Post.findById(req.params.id);
-//     const upload = getPost[0];
-
-//     res.status(200).json({ modifiedPost: upload });
-//     console.log(req.file);
-//   } catch (e) {
-//     console.log(e);
-//     res.sendStatus(500);
-//   }
-// };
-
 exports.modifyPost = async (req, res, next) => {
   const id = req.params.id;
-  // building the user object, spread gets all details, just building the avatar file
+
+  let imageArray = [];
+  if (req.files) {
+    // console.log(req.files.image[0].filename);
+
+    const newFiles = Object.values(req.files.image);
+    const imageUrl = `${req.protocol}://${req.get('host')}`;
+    newFiles.forEach((f) => {
+      imageArray.push(`${imageUrl}/images/${f.filename}`);
+    });
+  }
+
+  // building the post object, spread gets all details, just building the image file
   const post = {
     ...req.body,
-    image: `${req.protocol}://${req.get('host')}/uploads/images/${
-      req.files.image[0].filename
-    }`,
+    image: JSON.stringify(imageArray),
   };
 
   try {
     const getPost = await Post.findById(id);
-    const image = getPost[0].image;
-    console.log(eval(image));
+    const image = JSON.parse(getPost[0].image);
 
-    // Post already has image(s), unlink the existing one(s) and replace it/them
-    if (image) {
-      // let imageArray = [];
-      // const newFiles = Object.values(req.files.image);
-      // const imageUrl = `${req.protocol}://${req.get('host')}`;
-      // newFiles.forEach((f) => {
-      //   imageArray.push(`${imageUrl}/images/${f.filename}`);
-      // });
+    // Post already has image(s), user is adding more to them
+    if (image && req.files) {
+      for (const f of image) {
+        imageArray.push(f);
+      }
 
-      objectImage = eval(image);
-      //   const filenames = objectImage.map((filename) => {
-      //     myFile = filename.split('images/')[1];
-      //     console.log(myFile);
-      //   });
-      //   console.log(filenames);
-      for (let i in objectImage) {
-        console.log(i);
+      const newFiles = Object.values(req.files.image);
+      const imageUrl = `${req.protocol}://${req.get('host')}`;
+      newFiles.forEach((f) => {
+        imageArray.push(`${imageUrl}/images/${f.filename}`);
+      });
+
+      const post = {
+        ...req.body,
+        image: JSON.stringify(imageArray),
+      };
+      const updatedPost = await Post.update(post, id);
+      // console.log(req.files.image);
+      if (updatedPost) {
+        res.status(200).json({
+          modifications: post,
+        });
+      } else {
+        res.status(404).json({ message: 'Cannot modify post infos' });
+      }
+    } else {
+      const updatedPost = await Post.update(post, id);
+      if (updatedPost) {
+        res.status(200).json({
+          modifications: post,
+        });
+      } else {
+        res.status(404).json({ message: 'Cannot modify post infos' });
       }
     }
-
-    //     fs.unlink(`uploads/images/${filename}`, async () => {
-    //       const updatedPost = await Post.update(post, id);
-    //       // console.log(req.files.image);
-    //       if (updatedPost) {
-    //         res.status(200).json({
-    //           modifications: req.body,
-    //           image: req.files,
-    //         });
-    //       } else {
-    //         res.status(404).json({ message: 'Cannot modify post infos' });
-    //       }
-    //     });
-    // }
-
-    // } else {
-    //   // Post has no image
-    //   const updatedPost = await Post.update(post, id);
-    //   if (updatedPost) {
-    //     res.status(200).json({
-    //       modifications: req.body,
-    //       image: req.files,
-    //     });
-    //   } else {
-    //     res.status(404).json({ message: 'Cannot modify post infos' });
-    //   }
-    // }
   } catch (e) {
     console.log(e);
     res.sendStatus(500);
@@ -143,30 +123,36 @@ exports.modifyPost = async (req, res, next) => {
 };
 
 exports.deletePost = async (req, res, next) => {
+  const id = req.params.id;
   try {
-    const post = await Post.findById(req.params.id);
+    const post = await Post.findById(id);
     if (!post[0]) {
       return res.status(404).json({ error: 'Post not found' });
     }
 
     // This line allow us to verify if the post's owner can delete his post
-    if (post[0].user_id !== req.auth.userId) {
+    else if (post[0].user_id !== req.auth.userId) {
       return res
         .status(403)
         .json({ error: 'Unauthorized request, id not matching' });
-    }
-    const image = post[0].image;
-    if (image) {
-      const filename = await image.split('/images/')[1];
-      fs.unlink(`uploads/images/${filename}`, () => {
-        const deletePost = Post.delete(req.params.id);
-        res.status(200).json({
+    } else {
+      const image = JSON.parse(post[0].image);
+
+      if (image) {
+        // loop to unlink all images
+        for (const f of image) {
+          fs.unlink(`uploads/images/${f.split('/images/')[1]}`, (err) => {
+            if (err) throw err;
+          });
+        }
+        const deletePost = await Post.delete(id);
+        return res.status(200).json({
           message: 'Post successfully deleted with all images',
         });
-      });
-    } else {
-      const deletePost = await Post.delete(req.params.id);
-      res.status(200).json({ message: 'Post successfully deleted' });
+      } else {
+        const deletePost = await Post.delete(id);
+        return res.status(200).json({ message: 'Post successfully deleted' });
+      }
     }
   } catch (e) {
     console.log(e);

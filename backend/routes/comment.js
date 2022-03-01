@@ -5,12 +5,15 @@ const { auth, authAdmin } = require('../middleware/auth');
 
 const commentCtrl = require('../controllers/comment');
 
-router.get('/comments', auth, commentCtrl.getAllComments);
-router.get('/comments/:id', auth, commentCtrl.getOneComment);
+router.get('/posts/:postId/comments/', auth, commentCtrl.getAllComments);
+router.post('/posts/:postId/comments/', auth, commentCtrl.createComment);
+router.put('/posts/:postId/comments/:id', auth, commentCtrl.modifyComment);
+router.delete('/posts/:postId/comments/:id', auth, commentCtrl.deleteComment);
 
-router.post('/comments', commentCtrl.createComment);
-// router.put('/comments/:id', auth, multer, commentCtrl.modifyComment);
-// router.delete('/comments/:id', auth, commentCtrl.deleteComment);
+// router.get('/posts/comments/', auth, commentCtrl.countComments);
+
+router.get('/users/:userId/comments/', auth, commentCtrl.getAllCommentsUser);
+// router.get('/users/:userId/comments/', auth, commentCtrl.getAllCommentsUser);
 
 // router.put('comments/:id/likes', auth, commentCtrl.likeComment);
 

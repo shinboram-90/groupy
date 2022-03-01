@@ -73,15 +73,17 @@ exports.deleteUser = async (req, res, next) => {
 
 exports.modifyUser = async (req, res, next) => {
   const id = req.params.id;
+
   // building the user object, spread gets all details, just building the avatar file
   const user = {
     ...req.body,
-    avatar: `${req.protocol}://${req.get('host')}/uploads/avatars/${
+    avatar: `${req.protocol}://${req.get('host')}/avatars/${
       req.files.avatar[0].filename
     }`,
   };
   try {
     const getUser = await User.findById(id);
+    console.log(req.files);
     const avatar = getUser[0].avatar;
 
     // User already has one avatar, unlink the existing one and replace it
@@ -94,7 +96,7 @@ exports.modifyUser = async (req, res, next) => {
         if (updatedUser) {
           res.status(200).json({
             modifications: req.body,
-            avatar: req.files,
+            avatar: avatar,
           });
         } else {
           res.status(404).json({ message: 'Cannot modify user infos' });

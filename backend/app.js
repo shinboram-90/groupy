@@ -48,7 +48,7 @@ app.use('/images', express.static(path.join(__dirname, '/uploads/images')));
 app.use('/avatars', express.static(path.join(__dirname, '/uploads/avatars')));
 app.use('/api', userRoutes);
 app.use('/api', postRoutes);
-app.use('/api/post', commentRoutes);
+app.use('/api', commentRoutes);
 
 // Renvoie les requetes dans la console
 app.use(morgan('tiny'));

@@ -13,7 +13,7 @@ const Post = function (post) {
 Post.findAll = async () => {
   return new Promise((resolve, reject) => {
     pool.query(
-      'SELECT p.*, u.avatar, u.username FROM posts p JOIN users u ON p.user_id = u.id ORDER BY p.created_at DESC',
+      'SELECT p.*, u.avatar, u.username FROM posts p JOIN users u ON p.user_id = u.id WHERE p.status = "published" ORDER BY p.created_at DESC',
       (err, posts) => {
         if (err) {
           return reject(err);
@@ -31,10 +31,7 @@ Post.create = async (newPost) => {
       if (err) {
         return reject(err);
       }
-      // pool.query('INSERT INTO posts (newPost) VALUES(?)'[newPost], (err, res) => {
-      //   if (err) {
-      //     return reject(err);
-      //   }
+
       console.log('New post succesfully published');
       return resolve(res);
     });
@@ -74,8 +71,8 @@ Post.findByUsername = async (user) => {
 Post.update = async (post, id) => {
   return new Promise((resolve, reject) => {
     pool.query(
-      `UPDATE posts SET title=?, content=?, image=?, WHERE id=?`,
-      [post.title, post.content, post.image, id],
+      `UPDATE posts SET ? WHERE id=?`,
+      [post, id],
       (err, updatedPost) => {
         if (err) {
           return reject(err);
