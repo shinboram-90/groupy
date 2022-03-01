@@ -5,7 +5,6 @@ const Comment = function (comment) {
   this.post_id = comment.post_id;
   this.status = comment.status;
   this.content = comment.content;
-
   this.created_at = new Date();
   this.updated_at = new Date();
 };
@@ -114,20 +113,20 @@ Comment.delete = async (id) => {
   });
 };
 
-Comment.updateLikes = async (id, userId) => {
-  return new Promise((resolve, reject) => {
-    pool.query(
-      `UPDATE comments SET like_user_id = like_user_id || ?, likes = likes + 1 WHERE NOT (like_user_id @> ?) AND id = ?`,
-      [userId, id],
-      (err, likeComment) => {
-        if (err) {
-          return reject(err);
-        }
-        console.log(`Like/dislike given by user Id ${userId}`);
-        return resolve(likeComment);
-      }
-    );
-  });
-};
+// Comment.updateLikes = async (id, userId) => {
+//   return new Promise((resolve, reject) => {
+//     pool.query(
+//       `UPDATE comments SET like_user_id = like_user_id || ?, likes = likes + 1 WHERE NOT (like_user_id @> ?) AND id = ?`,
+//       [userId, id],
+//       (err, likeComment) => {
+//         if (err) {
+//           return reject(err);
+//         }
+//         console.log(`Like/dislike given by user Id ${userId}`);
+//         return resolve(likeComment);
+//       }
+//     );
+//   });
+// };
 
 module.exports = Comment;

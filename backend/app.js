@@ -13,6 +13,8 @@ const userRoutes = require('./routes/user');
 const postRoutes = require('./routes/post');
 const commentRoutes = require('./routes/comment');
 
+const publicPath = path.join(__dirname, '..', 'public');
+
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
@@ -54,5 +56,10 @@ app.use('/api', commentRoutes);
 app.use(morgan('tiny'));
 
 app.use(limiter);
+
+app.use(express.static(publicPath));
+app.get('*', (req, res) => {
+  res.sendFile(path.join(publicPath, 'index.html'));
+});
 
 module.exports = app;
