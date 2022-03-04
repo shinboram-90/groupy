@@ -31,7 +31,7 @@ exports.createPost = async (req, res, next) => {
     const newFiles = Object.values(req.files.image);
     const imageUrl = `${req.protocol}://${req.get('host')}`;
     newFiles.forEach((f) => {
-      imageArray.push(`${imageUrl}/images/${f.filename}`);
+      imageArray.push(`${imageUrl}/uploads/images/${f.filename}`);
     });
   }
 
@@ -67,7 +67,7 @@ exports.modifyPost = async (req, res, next) => {
     const newFiles = Object.values(req.files.image);
     const imageUrl = `${req.protocol}://${req.get('host')}`;
     newFiles.forEach((f) => {
-      imageArray.push(`${imageUrl}/images/${f.filename}`);
+      imageArray.push(`${imageUrl}/uploads/images/${f.filename}`);
     });
   }
 
@@ -82,7 +82,7 @@ exports.modifyPost = async (req, res, next) => {
     const image = JSON.parse(getPost[0].image);
 
     // Post already has image(s), user is adding more to them
-    if (image && req.files) {
+    if (image) {
       for (const f of image) {
         imageArray.push(f);
       }
@@ -90,7 +90,7 @@ exports.modifyPost = async (req, res, next) => {
       const newFiles = Object.values(req.files.image);
       const imageUrl = `${req.protocol}://${req.get('host')}`;
       newFiles.forEach((f) => {
-        imageArray.push(`${imageUrl}/images/${f.filename}`);
+        imageArray.push(`${imageUrl}/uploads/images/${f.filename}`);
       });
 
       const post = {

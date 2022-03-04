@@ -1,7 +1,7 @@
 const express = require('express');
 // Path module has many useful properties and methods to access and manipulate paths in the file system.
 const path = require('path');
-const helmet = require('helmet');
+// const helmet = require('helmet');
 const cors = require('cors');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
@@ -13,7 +13,7 @@ const userRoutes = require('./routes/user');
 const postRoutes = require('./routes/post');
 const commentRoutes = require('./routes/comment');
 
-const publicPath = path.join(__dirname, '..', 'public');
+// const publicPath = path.join(__dirname, '..', 'public');
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -22,14 +22,14 @@ const limiter = rateLimit({
 
 const app = express();
 
-const corsOptions = {
-  origin: 'http://localhost:3000',
-  credentials: true, //access-control-allow-credentials:true
-  optionSuccessStatus: 200,
-};
+// const corsOptions = {
+//   origin: 'http://localhost:3001',
+//   credentials: true, //access-control-allow-credentials:true
+//   optionSuccessStatus: 200,
+// };
 
 app.use((req, res, next) => {
-  // res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader(
     'Access-Control-Allow-Headers',
     'Origin, X-Requested-With, Content, Accept, Content-Type, Authorization'
@@ -41,13 +41,19 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(cors(corsOptions));
-app.use(helmet());
+app.use(cors());
+// app.use(helmet());
 app.use(cookieParser());
 app.use(express.json());
 
-app.use('/images', express.static(path.join(__dirname, '/uploads/images')));
-app.use('/avatars', express.static(path.join(__dirname, '/uploads/avatars')));
+app.use(
+  '/uploads/images',
+  express.static(path.join(__dirname, '/uploads/images'))
+);
+app.use(
+  '/uploads/avatars',
+  express.static(path.join(__dirname, '/uploads/avatars'))
+);
 app.use('/api', userRoutes);
 app.use('/api', postRoutes);
 app.use('/api', commentRoutes);
@@ -57,9 +63,14 @@ app.use(morgan('tiny'));
 
 app.use(limiter);
 
-app.use(express.static(publicPath));
-app.get('*', (req, res) => {
-  res.sendFile(path.join(publicPath, 'index.html'));
+// app.use(express.static(publicPath));
+// app.get('*', (req, res) => {
+//   res.sendFile(path.join(publicPath, 'index.html'));
+// });
+app.use(express.static(path.join(__dirname, 'build')));
+
+app.get('/*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
 
 module.exports = app;

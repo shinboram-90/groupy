@@ -2,6 +2,3 @@
 .DS_Store
 .env
 images
-
-package.json
-package-lock.json

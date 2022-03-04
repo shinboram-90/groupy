@@ -75,48 +75,56 @@ exports.modifyUser = async (req, res, next) => {
   const id = req.params.id;
 
   // building the user object, spread gets all details, just building the avatar file
-  const user = {
-    ...req.body,
-    avatar: `${req.protocol}://${req.get('host')}/avatars/${
-      req.files.avatar[0].filename
-    }`,
-  };
-  try {
-    const getUser = await User.findById(id);
-    console.log(req.files);
-    const avatar = getUser[0].avatar;
+  if (req.files) {
+    const user = {
+      ...req.body,
+      avatar: `${req.protocol}://${req.get('host')}/uploads/avatars/${
+        req.files.avatar[0].filename
+      }`,
+    };
+    try {
+      const getUser = await User.findById(id);
+      console.log(req.files);
+      const avatar = getUser[0].avatar;
 
-    // User already has one avatar, unlink the existing one and replace it
-    if (avatar) {
-      const filename = avatar.split('avatars/')[1];
+      // User already has one avatar, unlink the existing one and replace it
+      if (avatar) {
+        const filename = avatar.split('avatars/')[1];
 
-      fs.unlink(`uploads/avatars/${filename}`, async () => {
+        fs.unlink(`uploads/avatars/${filename}`, async () => {
+          const updatedUser = await User.update(user, id);
+          // console.log(req.files.avatar);
+          if (updatedUser) {
+            res.status(200).json({
+              modifications: req.body,
+              avatar: avatar,
+            });
+          } else {
+            res.status(404).json({ message: 'Cannot modify user infos' });
+          }
+        });
+      } else {
+        // User has no avatar
         const updatedUser = await User.update(user, id);
-        // console.log(req.files.avatar);
         if (updatedUser) {
           res.status(200).json({
-            modifications: req.body,
-            avatar: avatar,
+            modifications: user,
           });
         } else {
           res.status(404).json({ message: 'Cannot modify user infos' });
         }
-      });
-    } else {
-      // User has no avatar
-      const updatedUser = await User.update(user, id);
-      if (updatedUser) {
-        res.status(200).json({
-          modifications: req.body,
-          avatar: req.files,
-        });
-      } else {
-        res.status(404).json({ message: 'Cannot modify user infos' });
       }
+    } catch (e) {
+      console.log(e);
+      res.sendStatus(500);
     }
-  } catch (e) {
-    console.log(e);
-    res.sendStatus(500);
+  } else {
+    const updatedUser = await User.update(req.body, id);
+    if (updatedUser) {
+      res.status(200).json({
+        modifications: req.body,
+      });
+    }
   }
 };
 
