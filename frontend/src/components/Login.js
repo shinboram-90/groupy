@@ -2,14 +2,12 @@ import { Button, Divider, Form, Grid, Segment } from 'semantic-ui-react';
 import { useState, useEffect } from 'react';
 import useAuth from '../hooks/useAuth';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { useCookies } from 'react-cookie';
 import axios from '../api/axios';
 
 const LOGIN_URL = '/login';
 
 const Login = () => {
   const { setAuth } = useAuth();
-  const [cookies, setCookie] = useCookies(['access_token']);
 
   const [data, setData] = useState({
     email: '',
@@ -44,8 +42,8 @@ const Login = () => {
       const user = response.data.user[0];
       const token = response.data.token;
       const role = response.data.user[0].role;
-      setCookie('access_token', token, { path: '/' });
       setAuth({ user, role, token });
+      localStorage.setItem('token', token);
       // navigate(from, { replace: true });
       navigate('/profile');
     });
